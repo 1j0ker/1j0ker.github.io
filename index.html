@@ -248,12 +248,11 @@
 <p><strong>所以如何获取真实IP非常关键</strong><br>其实也就是利用Nginx上的http模块操作 <code>$http_x_forwarded_for</code>和<code>$clientRealIp</code>:</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>获取用户真实IP，并赋值给变量$clientRealIP</span><br><span class="line">map $http_x_forwarded_for  $clientRealIp &#123;</span><br><span class="line">        ""      $remote_addr;</span><br><span class="line">        ~^(?P&lt;firstAddr&gt;[0-9\.]+),?.*$  $firstAddr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>其实也就是上面讲到的，匹配了 <code>$http_x_forwarded_for</code> 的第一个值(安全设置下的X-Forward-For第一个值就为源IP)，而且代码中还配合使用了 <code>$remote_addr</code>，避免了直接访问下时 <code>$http_x_forwarded_for</code>为空；替代了传统的 <code>$remote_addr</code>；<br><br></p>
+<p>其实也就是上面讲到的，匹配了 <code>$http_x_forwarded_for</code> 的第一个值(安全设置下的X-Forward-For第一个值就为源IP)，而且代码中还配合使用了 <code>$remote_addr</code>，避免了直接访问下时 <code>$http_x_forwarded_for</code>为空；替代了传统的 <code>$remote_addr</code>；</p>
 <h4>其实都是对用户未使用高度匿名代理、普通匿名代理的处理</h4> 
-[3种正向代理方式的介绍](https://blog.csdn.net/bytxl/article/details/15334153)
-<br>
-既然已经拿到了真实 IP，利用Nginx的判断，`return 403`就好了；
 
+<p><a href="https://blog.csdn.net/bytxl/article/details/15334153" title="3种正向代理方式介绍" target="_blank" rel="noopener">3种正向代理方式的介绍</a></p>
+<p>既然已经拿到了真实 IP，利用Nginx的判断，<code>return 403</code>就好了；</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>如果真实IP为 123.123.123.123，那么返回403</span><br><span class="line">if ($clientRealIp ~* "121.42.0.18|121.42.0.19") &#123;</span><br><span class="line">        #add_header Content-Type text/plain;</span><br><span class="line">        return 403;</span><br><span class="line">        break;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>到这里我对<code>X-Forward-For</code>的一些理解就介绍完了，后面还有对3种代理方式的学习，以及透明代理，普通匿名代理和高级匿名代理的理解；<br>贴一下参考：<a href="https://blog.51cto.com/z00w00/1031287" title="透明代理、正向代理、反向代理" target="_blank" rel="noopener">透明代理、正向代理、反向代理</a></p>
