@@ -8,18 +8,18 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>寻找 X-Forwarded-For 的真实IP的一些理解(续) | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="#寻找 X-Forwarded-For 的真实IP  *前言：为什么要寻找真实IP？* 因为在实际项目中，用户ip的获取很重要。通过报障用户的ip来快速定位用户的请求日志，在威胁分析中定位攻击源目IP。  紧接上次的X-Forward-For的介绍，我们能了解到，XFF头中可能会存在真实IP，不真实的原因总结为两点： - 人为修改HTTP包头的X-Forward-For,导致真实IP的混杂； -">
+  <meta name="description" content="#寻找 X-Forwarded-For 的真实IP 1   *前言：为什么要寻找真实IP？* 因为在实际项目中，用户ip的获取很重要。通过报障用户的ip来快速定位用户的请求日志，在威胁分析中定位攻击源目IP。  紧接上次的X-Forward-For的介绍，我们能了解到，XFF头中可能会存在真实IP，不真实的原因总结为两点： - 人为修改HTTP包头的X-Forward-For,导致真实IP的混杂">
 <meta name="keywords" content="To be continued...">
 <meta property="og:type" content="article">
 <meta property="og:title" content="寻找 X-Forwarded-For 的真实IP的一些理解(续)">
 <meta property="og:url" content="http://yoursite.com/2019/07/17/XFFsearch_real_ip/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="#寻找 X-Forwarded-For 的真实IP  *前言：为什么要寻找真实IP？* 因为在实际项目中，用户ip的获取很重要。通过报障用户的ip来快速定位用户的请求日志，在威胁分析中定位攻击源目IP。  紧接上次的X-Forward-For的介绍，我们能了解到，XFF头中可能会存在真实IP，不真实的原因总结为两点： - 人为修改HTTP包头的X-Forward-For,导致真实IP的混杂； -">
+<meta property="og:description" content="#寻找 X-Forwarded-For 的真实IP 1   *前言：为什么要寻找真实IP？* 因为在实际项目中，用户ip的获取很重要。通过报障用户的ip来快速定位用户的请求日志，在威胁分析中定位攻击源目IP。  紧接上次的X-Forward-For的介绍，我们能了解到，XFF头中可能会存在真实IP，不真实的原因总结为两点： - 人为修改HTTP包头的X-Forward-For,导致真实IP的混杂">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-07-18T14:36:15.616Z">
+<meta property="og:updated_time" content="2019-07-18T14:39:32.785Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="寻找 X-Forwarded-For 的真实IP的一些理解(续)">
-<meta name="twitter:description" content="#寻找 X-Forwarded-For 的真实IP  *前言：为什么要寻找真实IP？* 因为在实际项目中，用户ip的获取很重要。通过报障用户的ip来快速定位用户的请求日志，在威胁分析中定位攻击源目IP。  紧接上次的X-Forward-For的介绍，我们能了解到，XFF头中可能会存在真实IP，不真实的原因总结为两点： - 人为修改HTTP包头的X-Forward-For,导致真实IP的混杂； -">
+<meta name="twitter:description" content="#寻找 X-Forwarded-For 的真实IP 1   *前言：为什么要寻找真实IP？* 因为在实际项目中，用户ip的获取很重要。通过报障用户的ip来快速定位用户的请求日志，在威胁分析中定位攻击源目IP。  紧接上次的X-Forward-For的介绍，我们能了解到，XFF头中可能会存在真实IP，不真实的原因总结为两点： - 人为修改HTTP包头的X-Forward-For,导致真实IP的混杂">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -177,6 +177,8 @@
       
         <br>
 #寻找 X-Forwarded-For 的真实IP
+<h1>1</h1>
+
 <br>
 *前言：为什么要寻找真实IP？*
 因为在实际项目中，用户ip的获取很重要。通过报障用户的ip来快速定位用户的请求日志，在威胁分析中定位攻击源目IP。
