@@ -8,18 +8,18 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>寻找 X-Forwarded-For 的真实IP的一些理解(续) | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="#寻找 X-Forwarded-For 的真实IP#  *前言：为什么要寻找真实IP？* 因为在实际项目中，用户ip的获取很重要。通过报障用户的ip来快速定位用户的请求日志，在威胁分析中定位攻击源目IP。  紧接上次的X-Forward-For的介绍，我们能了解到，XFF头中可能会存在真实IP，不真实的原因总结为两点： - 人为修改HTTP包头的X-Forward-For,导致真实IP的混杂；">
+  <meta name="description" content="#寻找 X-Forwarded-For 的真实IP  *前言：为什么要寻找真实IP？* 因为在实际项目中，用户ip的获取很重要。通过报障用户的ip来快速定位用户的请求日志，在威胁分析中定位攻击源目IP。  紧接上次的X-Forward-For的介绍，我们能了解到，XFF头中可能会存在真实IP，不真实的原因总结为两点： - 人为修改HTTP包头的X-Forward-For,导致真实IP的混杂； -">
 <meta name="keywords" content="To be continued...">
 <meta property="og:type" content="article">
 <meta property="og:title" content="寻找 X-Forwarded-For 的真实IP的一些理解(续)">
 <meta property="og:url" content="http://yoursite.com/2019/07/17/XFFsearch_real_ip/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="#寻找 X-Forwarded-For 的真实IP#  *前言：为什么要寻找真实IP？* 因为在实际项目中，用户ip的获取很重要。通过报障用户的ip来快速定位用户的请求日志，在威胁分析中定位攻击源目IP。  紧接上次的X-Forward-For的介绍，我们能了解到，XFF头中可能会存在真实IP，不真实的原因总结为两点： - 人为修改HTTP包头的X-Forward-For,导致真实IP的混杂；">
+<meta property="og:description" content="#寻找 X-Forwarded-For 的真实IP  *前言：为什么要寻找真实IP？* 因为在实际项目中，用户ip的获取很重要。通过报障用户的ip来快速定位用户的请求日志，在威胁分析中定位攻击源目IP。  紧接上次的X-Forward-For的介绍，我们能了解到，XFF头中可能会存在真实IP，不真实的原因总结为两点： - 人为修改HTTP包头的X-Forward-For,导致真实IP的混杂； -">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-07-18T14:29:04.607Z">
+<meta property="og:updated_time" content="2019-07-18T14:36:15.616Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="寻找 X-Forwarded-For 的真实IP的一些理解(续)">
-<meta name="twitter:description" content="#寻找 X-Forwarded-For 的真实IP#  *前言：为什么要寻找真实IP？* 因为在实际项目中，用户ip的获取很重要。通过报障用户的ip来快速定位用户的请求日志，在威胁分析中定位攻击源目IP。  紧接上次的X-Forward-For的介绍，我们能了解到，XFF头中可能会存在真实IP，不真实的原因总结为两点： - 人为修改HTTP包头的X-Forward-For,导致真实IP的混杂；">
+<meta name="twitter:description" content="#寻找 X-Forwarded-For 的真实IP  *前言：为什么要寻找真实IP？* 因为在实际项目中，用户ip的获取很重要。通过报障用户的ip来快速定位用户的请求日志，在威胁分析中定位攻击源目IP。  紧接上次的X-Forward-For的介绍，我们能了解到，XFF头中可能会存在真实IP，不真实的原因总结为两点： - 人为修改HTTP包头的X-Forward-For,导致真实IP的混杂； -">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -176,7 +176,7 @@
     <div class="article-entry" itemprop="articleBody">
       
         <br>
-#寻找 X-Forwarded-For 的真实IP#
+#寻找 X-Forwarded-For 的真实IP
 <br>
 *前言：为什么要寻找真实IP？*
 因为在实际项目中，用户ip的获取很重要。通过报障用户的ip来快速定位用户的请求日志，在威胁分析中定位攻击源目IP。
@@ -188,11 +188,11 @@
 <p>所以，接下来，我所讨论的就是，当人为去修改XFF头时，我们能有什么办法去寻找到真实IP，或者说去防止这种情况的发生。</p>
 <hr>
 <br>
-###如何获得真实IP？###
+###如何获得真实IP？
 <br>
 
-<p>####- 使用 X-Forwarded-For + Real IP 模块：####<br>可以使用nginx的 <code>ngx_http_realip_module</code> 模块，从 X-Forwarded-For 或其他属性中提取真实IP。此处以 X-Forwarded-For 结合该模块为例子，需要做两件事：</p>
 <ul>
+<li>####使用 X-Forwarded-For + Real IP 模块:<br>可以使用nginx的 <code>ngx_http_realip_module</code> 模块，从 X-Forwarded-For 或其他属性中提取真实IP。此处以 X-Forwarded-For 结合该模块为例子，需要做两件事：</li>
 <li>请求途径的各代理需要设置 <code>proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for</code>;</li>
 <li>利用 realip 模块获取真实IP<br>这里proxy3的部分配置(proxy3将请求直接转发到后端服务)，如下：</li>
 </ul>
@@ -212,7 +212,9 @@
 <li>而且在Proxy1中根据XFF的规则，此时用户的代理IP就是他本身的IP；</li>
 </ul>
 <p>最终，proxy3 的 <code>$remote_addr</code> 也拿到了客户端的真实IP 123.123.123.123，然后 proxy3 将 remote_addr 传递到后端服务中去；<br><br></p>
-<p>####- 使用X-Forwarded-For + 安全设置:####<br>由于客户端可以自行传递X-Forwarded-For，因此，可以在第一个代理处重置其值，达到忽略客户端传递的X-Forwarded-For的效果，因为proxy1的 <code>$remote_addr</code> 是客户端真实IP:</p>
+<ul>
+<li>####使用X-Forwarded-For + 安全设置:<br>由于客户端可以自行传递X-Forwarded-For，因此，可以在第一个代理处重置其值，达到忽略客户端传递的X-Forwarded-For的效果，因为proxy1的 <code>$remote_addr</code> 是客户端真实IP:</li>
+</ul>
 <p>在 proxy1 中进行如下配置：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">proxy_set_header X-Forwarded-For $remote_addr;</span><br></pre></td></tr></table></figure>
 
@@ -228,7 +230,7 @@
 <p>在最后的Proxy3中也打印出了真实IP：123.123.123.123</p>
 <hr>
 <br>
-##网站使用CDN之后如何禁止恶意用户真实IP##
+##网站使用CDN之后如何禁止恶意用户真实IP
 <br>
 这是前几天做威胁分析时遇到的麻烦问题；
 在威胁分析中，各种层出不断的恶意扫描、拉取、注入等图谋不轨行为令人头大，当然我们一般可以直接通过 iptables 、 Nginx 的 deny 指令或者是程序来 ban 掉这些恶意请求IP；
