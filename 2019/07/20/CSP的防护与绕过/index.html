@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="CSP的概念    CSP的前端防护 XSS向来是安全方面所重视的一大难题，虽然近年来在OWASP中下降了一些，但仍是实际生产环境中不可忽略的问题。 对于一个基本的XSS漏洞页面，它发生的原因往往是从用户输入的数据到输出没有有效的过滤，就比如下面的这个范例代码。 123&amp;lt;?php$a = $_GET[&apos;a&apos;];echo $a;  毫无过滤，我们可以很轻松的构造一种payload来实现XSS：">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-07-22T14:24:28.803Z">
+<meta property="og:updated_time" content="2019-07-22T14:41:53.587Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CSP的防护与绕过">
 <meta name="twitter:description" content="CSP的概念    CSP的前端防护 XSS向来是安全方面所重视的一大难题，虽然近年来在OWASP中下降了一些，但仍是实际生产环境中不可忽略的问题。 对于一个基本的XSS漏洞页面，它发生的原因往往是从用户输入的数据到输出没有有效的过滤，就比如下面的这个范例代码。 123&amp;lt;?php$a = $_GET[&apos;a&apos;];echo $a;  毫无过滤，我们可以很轻松的构造一种payload来实现XSS：">
@@ -254,13 +254,15 @@ XSS向来是安全方面所重视的一大难题，虽然近年来在OWASP中下
 <p>如果JS中存在操作location.hash导致的xss，那么这样的攻击请求不会经过后台；<br>或者通过通过CSS选择器来读取页面内容，页面只变化了CSS，构造纯静态的XSS，不过CSP筛选：</p>
 <figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">*<span class="selector-attr">[attribute^="a"]</span>&#123;<span class="attribute">background</span>:<span class="built_in">url</span>(<span class="string">"record?match=a"</span>)&#125; </span><br><span class="line">*<span class="selector-attr">[attribute^="b"]</span>&#123;<span class="attribute">background</span>:<span class="built_in">url</span>(<span class="string">"record?match=b"</span>)&#125; </span><br><span class="line">*<span class="selector-attr">[attribute^="c"]</span>&#123;<span class="attribute">background</span>:<span class="built_in">url</span>(<span class="string">"record?match=c"</span>)&#125; <span class="selector-attr">[...]</span></span><br></pre></td></tr></table></figure>
 
-<p>当匹配到对应的属性，页面就会发出相应的请求。</p>
+<p>当匹配到对应的属性，页面就会发出相应的请求。<br>上面是常见的3种绕过；<br><a href="https://paper.seebug.org/423/#0x03-csp-bypass" title="更多绕过的方法。" target="_blank" rel="noopener">更多绕过方法。</a></p>
 <h3>总结</h3>
 CSP虽然有着严格的白名单控制，但仍然只能减轻以偷取信息为目的的XSS行为，对于纯粹的破坏行为则无能为力，特别是DOM Based XSS，所以对于防范XSS还是需要数据的输入校验以及数据输出的Encode，前端浏览器与后端Nginx，Apache的共同协作；
 
 <h5>ref:</h5>
-[1] [https://paper.seebug.org/91/](https://paper.seebug.org/91/ "https://paper.seebug.org/91/")
-[2] [https://lorexxar.cn](https://lorexxar.cn "https://lorexxar.cn")
+[1] [https://paper.seebug.org/91/](https://paper.seebug.org/91/ "https://paper.seebug.org/91")
+
+<p>[2] <a href="https://lorexxar.cn" title="https://lorexxar.cn" target="_blank" rel="noopener">https://lorexxar.cn</a></p>
+
       
 
       
