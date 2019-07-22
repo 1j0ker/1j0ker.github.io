@@ -6,15 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Hexo</title>
+  <title>CSP的防护与绕过 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="CSP的概念    CSP的前端防护 XSS向来是安全方面所重视的一大难题，虽然近年来在OWASP中下降了一些，但仍是实际生产环境中不可忽略的问题。 对于一个基本的XSS漏洞页面，它发生的原因往往是从用户输入的数据到输出没有有效的过滤，就比如下面的这个范例代码。 123&amp;lt;?php$a = $_GET[&apos;a&apos;];echo $a;  毫无过滤，我们可以很轻松的构造一种payload来实现XSS：">
+<meta name="keywords" content="To be continued...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSP的防护与绕过">
+<meta property="og:url" content="http://yoursite.com/2019/07/20/CSP的防护与绕过/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="CSP的概念    CSP的前端防护 XSS向来是安全方面所重视的一大难题，虽然近年来在OWASP中下降了一些，但仍是实际生产环境中不可忽略的问题。 对于一个基本的XSS漏洞页面，它发生的原因往往是从用户输入的数据到输出没有有效的过滤，就比如下面的这个范例代码。 123&amp;lt;?php$a = $_GET[&apos;a&apos;];echo $a;  毫无过滤，我们可以很轻松的构造一种payload来实现XSS：">
 <meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-07-22T14:24:28.803Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo">
+<meta name="twitter:title" content="CSP的防护与绕过">
+<meta name="twitter:description" content="CSP的概念    CSP的前端防护 XSS向来是安全方面所重视的一大难题，虽然近年来在OWASP中下降了一些，但仍是实际生产环境中不可忽略的问题。 对于一个基本的XSS漏洞页面，它发生的原因往往是从用户输入的数据到输出没有有效的过滤，就比如下面的这个范例代码。 123&amp;lt;?php$a = $_GET[&apos;a&apos;];echo $a;  毫无过滤，我们可以很轻松的构造一种payload来实现XSS：">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -150,16 +155,14 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-    <article id="post-CSP的防护与绕过" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+            <article id="post-CSP的防护与绕过" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/20/CSP的防护与绕过/">CSP的防护与绕过</a>
+    <h1 class="article-title" itemprop="name">
+      CSP的防护与绕过
     </h1>
   
 
@@ -261,162 +264,26 @@ CSP虽然有着严格的白名单控制，但仍然只能减轻以偷取信息�
       
 
       
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/20/CSP的防护与绕过/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
         </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-XFFsearch_real_ip" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/17/XFFsearch_real_ip/">寻找 X-Forwarded-For 的真实IP的一些理解(续)</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/17/XFFsearch_real_ip/" class="archive-article-date">
-  	<time datetime="2019-07-17T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-17</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <br>
-<h1>寻找 X-Forwarded-For 的真实IP</h1>
-<br>
-*前言：为什么要寻找真实IP？*
-因为在实际项目中，用户ip的获取很重要。通过报障用户的ip来快速定位用户的请求日志，在威胁分析中定位攻击源目IP。
-<br>
-紧接上次的X-Forward-For的介绍，我们能了解到，XFF头中可能会存在真实IP，不真实的原因总结为两点：
-
-<ul>
-<li>人为修改HTTP包头的X-Forward-For,导致真实IP的混杂；</li>
-<li>用户的正向代理访问：这个暂时没有解决办法，而且也是我在做威胁分析时遇到的异常头疼的问题之一；</li>
-</ul>
-<p>所以，接下来，我所讨论的就是，当人为去修改XFF头时，我们能有什么办法去寻找到真实IP，或者说去防止这种情况的发生。</p>
-<hr>
-<br>
-<h3>如何获得真实IP？</h3>
-<br>
-
-<ul>
-<li><h4>使用 X-Forwarded-For + Real IP 模块:</h4>
-可以使用nginx的 `ngx_http_realip_module` 模块，从 X-Forwarded-For 或其他属性中提取真实IP。此处以 X-Forwarded-For 结合该模块为例子，需要做两件事：</li>
-<li>请求途径的各代理需要设置 <code>proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for</code>;</li>
-<li>利用 realip 模块获取真实IP<br>这里proxy3的部分配置(proxy3将请求直接转发到后端服务)，如下：</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">  ...</span><br><span class="line">    location / &#123;</span><br><span class="line">        set_real_ip_from ip1(proxy1的IP); </span><br><span class="line">        real_ip_header    X-Forwarded-For;</span><br><span class="line">        real_ip_recursive on;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><code>set_real_ip_from</code>: 表示从何处获取真实IP(解决安全问题，只认可自己信赖的IP)，可以是IP或子网等， 可以设置多个set_real_ip_from，上面的例子中就设置的时Proxy1的IP；</li>
-<li><code>real_ip_header</code>：表示从HTTP包头的哪个header属性中获取真实IP；</li>
-<li><code>real_ip_recursive</code>：递归检索真实IP，若从 X-Forwarded-For 中获取，则需递归检索；若像从X-Real-IP中获取，则无需递归。</li>
-</ul>
-<p>基于上一章日志测试格式的测试数据，试验结果：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">"[proxy1]" 123.123.123.123 192.168.1.1, 192.168.1.2, 123.123.123.123 "GET /hello HTTP/1.1" 200</span><br><span class="line">"[proxy2]" 1.1.1.1(IP1) 192.168.1.1, 192.168.1.2, 123.123.123.123, 1.1.1.1 "GET /hello HTTP/1.0" 200</span><br><span class="line">"[proxy3]" 123.123.123.123 192.168.1.1, 192.168.1.2, 123.123.123.123, 1.1.1.1, 123.123.123.123 "GET /hello HTTP/1.0" 200</span><br></pre></td></tr></table></figure>
-
-<p>这里解释一下[Proxy3]中的第一个IP和最后一个IP为什么是我们的真实IP了：</p>
-<ul>
-<li>我们在Proxy3里的<code>set_real_ip_from</code>设置了真实IP的获取来源：Proxy1，而Proxy1 <code>$remote_addr</code>(再次强调，这个不可被更改)的就是我们的真实IP；</li>
-<li>而且在Proxy1中根据XFF的规则，此时用户的代理IP就是他本身的IP；</li>
-</ul>
-<p>最终，proxy3 的 <code>$remote_addr</code> 也拿到了客户端的真实IP 123.123.123.123，然后 proxy3 将 remote_addr 传递到后端服务中去；<br><br></p>
-<ul>
-<li><h4>使用X-Forwarded-For + 安全设置:</h4>
-由于客户端可以自行传递X-Forwarded-For，因此，可以在第一个代理处重置其值，达到忽略客户端传递的X-Forwarded-For的效果，因为proxy1的 `$remote_addr` 是客户端真实IP:
-
-</li>
-</ul>
-<p>在 proxy1 中进行如下配置：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">proxy_set_header X-Forwarded-For $remote_addr;</span><br></pre></td></tr></table></figure>
-
-<p>与此类似的是设置Proxy1中 X-Real-IP:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">proxy_set_header X-Real-IP $remote_addr;</span><br></pre></td></tr></table></figure>
-
-<p>配置下测试日志格式：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">log_format proxy1 '"[proxy1]" $http_x_real_ip "$request" $status';</span><br><span class="line">log_format proxy2 '"[proxy2]" $http_x_real_ip "$request" $status';</span><br><span class="line">log_format proxy3 '"[proxy3]" $http_x_real_ip "$request" $status';</span><br></pre></td></tr></table></figure>
-
-<p>看一下打印结果：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">"[proxy1]" - "GET /hello HTTP/1.1" 200</span><br><span class="line">"[proxy2]" 123.123.123.123 "GET /hello HTTP/1.0" 200</span><br><span class="line">"[proxy3]" 123.123.123.123 "GET /hello HTTP/1.0" 200</span><br></pre></td></tr></table></figure>
-
-<p>在最后的Proxy3中也打印出了真实IP：123.123.123.123</p>
-<hr>
-<br>
-<h2>网站使用CDN之后如何禁止恶意用户真实IP</h2>
-<br>
-这是前几天做威胁分析时遇到的麻烦问题；
-在威胁分析中，各种层出不断的恶意扫描、拉取、注入等图谋不轨行为令人头大，当然我们一般可以直接通过 iptables 、 Nginx 的 deny 指令或者是程序来 ban 掉这些恶意请求IP；
-但是对于套了一层 CDN 或代理的网站，这些方法可能就失效了。尤其是个人网站，可能就一台 VPS，然后套一个免费的 CDN 就行走在互联网了。并不是每个 CDN 都能精准的拦截各种恶意请求的，更闹心的是很多 CDN 还不支持用户在 CDN 上添加 BAN 规则...
-
-<p>基于上篇文章的内容的基础上，当网站部署了CDN后，用户又是何种访问模式呐？</p>
-<ul>
-<li>用户访问使用了 CDN 的网站<br>浏览器 –&gt; DNS 解析 –&gt; CDN 节点 –&gt; WEB 数据处理 –&gt; 数据吐到浏览器渲染展示</li>
-<li>用户通过代理上网访问了我们的网站<br>浏览器 –&gt; 代理上网 –&gt; DNS 解析 –&gt; CDN 节点 –&gt; WEB 数据处理 –&gt; 数据吐到浏览器渲染展示</li>
-</ul>
-<p>对于这两种访问模式，直接的<code>iptables -I INPUT -s 用户的ip -j DROP</code> 或者 <code>deny</code>都失去了作用，因为 iptables 和 deny 都只能针对直连 IP，而这2种模式中，WEB 服务器直连 IP 是 CDN 节点或者代理服务器，此时使用 iptable 或 deny 就只能把 CDN 节点 或代理 IP 给封了，可能误杀一大片正常用户了，而真正的罪魁祸首轻轻松松换一个代理 IP 又能继续请求了。</p>
-<p><strong>所以如何获取真实IP非常关键</strong><br>其实也就是利用Nginx上的http模块操作 <code>$http_x_forwarded_for</code>和<code>$clientRealIp</code>:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>获取用户真实IP，并赋值给变量$clientRealIP</span><br><span class="line">map $http_x_forwarded_for  $clientRealIp &#123;</span><br><span class="line">        ""      $remote_addr;</span><br><span class="line">        ~^(?P&lt;firstAddr&gt;[0-9\.]+),?.*$  $firstAddr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>其实也就是上面讲到的，匹配了 <code>$http_x_forwarded_for</code> 的第一个值(安全设置下的X-Forward-For第一个值就为源IP)，而且代码中还配合使用了 <code>$remote_addr</code>，避免了直接访问下时 <code>$http_x_forwarded_for</code>为空；替代了传统的 <code>$remote_addr</code>；</p>
-<h4>其实都是对用户未使用高度匿名代理、普通匿名代理的处理</h4> 
-
-<p><a href="https://blog.csdn.net/bytxl/article/details/15334153" title="3种正向代理方式介绍" target="_blank" rel="noopener">3种正向代理方式的介绍</a></p>
-<p>既然已经拿到了真实 IP，利用Nginx的判断，<code>return 403</code>就好了；</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>如果真实IP为 123.123.123.123，那么返回403</span><br><span class="line">if ($clientRealIp ~* "121.42.0.18|121.42.0.19") &#123;</span><br><span class="line">        #add_header Content-Type text/plain;</span><br><span class="line">        return 403;</span><br><span class="line">        break;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>到这里我对<code>X-Forward-For</code>的一些理解就介绍完了，后面还有对3种代理方式的学习，以及透明代理，普通匿名代理和高级匿名代理的理解；<br>贴一下参考：<a href="https://blog.51cto.com/z00w00/1031287" title="透明代理、正向代理、反向代理" target="_blank" rel="noopener">透明代理、正向代理、反向代理</a></p>
-
-      
-
       
     </div>
     <div class="article-info article-info-index">
@@ -436,16 +303,75 @@ CSP虽然有着严格的白名单控制，但仍然只能减轻以偷取信息�
       
 
       
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/17/XFFsearch_real_ip/">展开全文 >></a>
-        </p>
-      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/07/20/CSP的防护与绕过/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
       
       <div class="clearfix"></div>
     </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
+  
+  
+    <a href="/2019/07/17/XFFsearch_real_ip/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">寻找 X-Forwarded-For 的真实IP的一些理解(续)</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
 
 <aside class="wrap-side-operation">
     <div class="mod-side-operation">
@@ -465,440 +391,14 @@ CSP虽然有着严格的白名单控制，但仍然只能减轻以偷取信息�
 
 
 
-
   
-    <article id="post-X-Forward-f" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/15/X-Forward-f/">X-Forwarded-For 和 X-Real-IP 的一些理解与区别</a>
-    </h1>
   
 
-        
-        <a href="/2019/07/15/X-Forward-f/" class="archive-article-date">
-  	<time datetime="2019-07-15T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-15</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1>X-Forwarded-For简单理解</h1>
-
-
-<h2> 逐级记录代理信息</h2>
-
-<p>X-Forwarded-For 是一个 HTTP 扩展头部，用于让web服务器获取真实的用户的IP(但不一定是真实的，可被伪造，比如透明代理)；</p>
-<p><strong>那为什么 Web 服务器只有通过 X-Forwarded-For 头才能获取真实的 IP？</strong><br>&#8195;这里用PHP说明一下， PHP后端获取用户ip会调用$_SERVER[‘REMOTE_ADDR’]，他表示的是和服务器握手的IP是什么(不可伪造)；<br>但假如用户使用代理来访问服务器，那么与服务器建立链接的IP就是 代理ip，并非用户的ip；<br>请求路径可以看做：<br><code>客户端 (--&gt; 正向代理 --&gt; 透明代理 --&gt; 服务器反向代理) --&gt; 服务器端</code><br>( )内的代理不是必须的；<br><br><br><strong>那么什么又是正向代理？透明代理？反向代理？</strong></p>
-<ul>
-<li>正向代理：一般企业在出口网关处设置代理（为了加速，节省流量）</li>
-<li>透明代理：用户为了隐藏自己，自己设置代理（为了翻墙，这样就绕开了企业的正向代理）</li>
-<li>反向代理：部署在Web服务器前面，为了负载均衡，保护内网服务器数据；</li>
-</ul>
-<p>那么下面几种情况：</p>
-<ul>
-<li>假如客户端直接连接 Web 服务器（假设 Web 服务器有公网地址），则$_SERVER[‘REMOTE_ADDR’] 获取到的是客户端的真实 IP ；</li>
-<li>假设 Web 服务器前部署了反向代理（比如 Nginx），则 $_SERVER[‘REMOTE_ADDR’] 获取到的是反向代理设备的 IP（Nginx）；</li>
-<li>假设客户端通过正向代理直接连接 Web 服务器（假设 Web 服务器有公网地址），则 $_SERVER[‘REMOTE_ADDR’] 获取到的正向代理设备的 IP ；</li>
-</ul>
-<p>所以就是由于各种代理的问题，$_SERVER[‘REMOTE_ADDR’] 获取到的 IP 是 Web 服务器 TCP 连接的 IP(不可伪造，web服务器不修改这个ip)，而并非用户真正的ip；</p>
-<p>所以 <strong>X-Forwarded-For</strong>  出现了，它定义的协议头格式：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">X-Forwarded-For: client, proxy1, proxy2</span><br></pre></td></tr></table></figure>
-
-<p>client 表示用户的真实 IP，每经过一次代理服务器，代理服务器会在这个头里增加用户的 代理IP，但要注意的是，最后一个代理IP是不会添加到这个头里的，而是通过$_SERVER[‘REMOTE_ADDR’] 获取；</p>
-<h3>example_1:</h3>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">X-Forwarded-For: 1.1.1.1, 2.2.2.2, 3.3.3.3</span><br></pre></td></tr></table></figure>
-
-<p>原始ip:1.1.1.1 经过了 3 层代理访问当前服务器，第一层代理ip:2.2.2.2, 第二层代理ip:3.3.3.3, 第三层代理ip 也就是和服务端建立请求链接的ip:4.4.4.4;<br><br><br><strong>那接下来详细描述一下XFF的Proxy形成流程：</strong></p>
-<ul>
-<li>用户IP0 ——&gt; Proxy1（IP1）,Proxy1 记录用户的IP0 ，并将请求转发给Proxy2（IP2），并带上了HTTP Header X-Forward-For:IP0 ;</li>
-<li>Proxy2接收到Proxy1的请求后，读取到有X-Forward-For头，那么就将Proxy1的IP1继续添加到X-Forward-For中，构成X-Forward-For:IP0, IP1 ;</li>
-<li>同理，Proxy3 按照第二部构造出 X-Forwarded-For: IP0, IP1, IP2,转发给真正的服务器，比如NGINX，nginx收到了http请求，里面就是 X-Forwarded-For: IP0, IP1, IP2 这样的结果。所以Proxy 3 的IP3，不会出现在这里；</li>
-<li>而Nginx只能通过 $remote_address 获取到，所以 $remote_address 获取的就是和服务器建立TCP链接的IP３（这个无法伪造）；</li>
-</ul>
-<p>很多项目通过获取 X-Forwarded-For 中首个IP作为真实IP。但是X-Forwarded-For可以伪造。</p>
-<h3>Example2:</h3>
-- **正常访问时：**
-*！！！当X-Forward-For未使用安全设置，或者未使用`Real IP 模块`*时；
-在proxy1、proxy2、proxy3 的配置中都加上：（实际proxy1、2、3在同一台机器，仅作测试）
-`proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;`
-设置打印格式：
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">log_format proxy1 '"[proxy1]" $remote_addr $proxy_add_x_forwarded_for "$request" $status';</span><br><span class="line">log_format proxy2 '"[proxy2]" $remote_addr $proxy_add_x_forwarded_for "$request" $status';</span><br><span class="line">log_format proxy3 '"[proxy3]" $remote_addr $proxy_add_x_forwarded_for "$request" $status';</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><code>$remote_addr</code>：与自身建立TCP链接的IP；</li>
-<li><code>$proxy_add_x_forwarded_for</code>：打印XFF规则的IP；</li>
-</ul>
-<p>访问后，打印日志如下：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">"[proxy1]" 123.123.123.123 123.123.123.123 "GET /hello HTTP/1.1" 200</span><br><span class="line">"[proxy2]" 1.1.1.1 123.123.123.123, 1.1.1.1 "GET /hello HTTP/1.0" 200</span><br><span class="line">"[proxy3]" 2.2.2.2 123.123.123.123, 1.1.1.1, 2.2.2.2 "GET /hello HTTP/1.0" 200</span><br></pre></td></tr></table></figure>
-
-<p>（<strong>123.123.123.123为我的真实IP</strong>）<br>因此，此时取 X-Forwarded-For 中第一个IP得到的确实为客户端真实IP。<br><br></p>
-<ul>
-<li><strong>非正常访问时，在HTTP头中伪造XFF：</strong><br>客户端请求头中人为添加：X-Forwarded-For=192.168.1.1, 192.168.1.2，再看看结果：<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">"[proxy1]" 123.123.123.123 192.168.1.1, 192.168.1.2, 123.123.123.123 "GET /hello HTTP/1.1" 200</span><br><span class="line">"[proxy2]" 1.1.1.1 192.168.1.1, 192.168.1.2, 123.123.123.123, 1.1.1.1 "GET /hello HTTP/1.0" 200</span><br><span class="line">"[proxy3]" 2.2.2.2 192.168.1.1, 192.168.1.2, 123.123.123.123, 1.1.1.1, 2.2.2.2 "GET /hello HTTP/1.0" 200</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<p>由于 <code>$proxy_add_x_forward_for</code> 会继续追加Proxy1,Proxy2的ip1和ip2，所以真实IP0具体位置在哪里就不好判断了；</p>
-<ul>
-<li><strong>非正常访问，用户自己通过设置正向代理(普通匿名代理，高级匿名代理)的服务器访问目标：</strong><br>例如FQ，VPN之类的代理，访问目标服务器的请求完全由代理服务器发起，X-Forward-For的IP0 也是代理服务器的ip，所以无法判断用户真实ip;<br>
-
-</li>
-</ul>
-<h2>X-Real-IP</h2>
-<br>
-是一个自定义头。X-Real-Ip 通常被 HTTP 代理用来表示与它产生 TCP 连接的设备 IP，这个设备可能是其他代理，也可能是真正的请求端。
-需要注意的是，X-Real-Ip 目前并不属于任何标准，代理和 Web 应用之间可以约定用任何自定义头来传递这个信息。
-没有相关标准，上面的例子，如果配置了X-Read-IP，可能会有两种情况:
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 最后一跳是正向代理，可能会保留真实客户端IP</span><br><span class="line">X-Real-IP: 1.1.1.1(IP0)</span><br><span class="line">// 最后一跳是反向代理，比如Nginx，一般会是与之直接连接的客户端IP</span><br><span class="line">X-Real-IP: 3.3.3.3(IP2)</span><br></pre></td></tr></table></figure>
-
-<p>所以 ，如果只有一层代理，这两个头的值就是一样的;<br>但是如果有多级代理，x-forwarded-for效果是大于x-real-ip的，x-forwarded-for可以记录完整的代理链路;</p>
-<h3>To be continued...</h3>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/15/X-Forward-f/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-py_threading" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/15/py_threading/">Python多线程的变量影响</a>
-    </h1>
   
 
-        
-        <a href="/2019/07/15/py_threading/" class="archive-article-date">
-  	<time datetime="2019-07-15T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-15</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="Python多线程的变量影响"><a href="#Python多线程的变量影响" class="headerlink" title="Python多线程的变量影响"></a>Python多线程的变量影响</h1><h3 id="example1：sleep-控制多线程的变量"><a href="#example1：sleep-控制多线程的变量" class="headerlink" title="example1：sleep()控制多线程的变量"></a>example1：sleep()控制多线程的变量</h3><hr>
-<p><strong>py代码：</strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">num = <span class="number">100</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_1</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> num</span><br><span class="line">    print(<span class="string">"work_1 ---- %d\n"</span> % num)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_2</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        num += <span class="number">1</span></span><br><span class="line">        print(<span class="string">"work_2 ---- %d\n"</span> % num)</span><br><span class="line">        time.sleep(<span class="number">1</span>)<span class="comment">#sleep()控制了work_2线程顺序</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    print(<span class="string">"num最初：%d\n"</span> %num)</span><br><span class="line">    t_1 = threading.Thread(target=work_1)</span><br><span class="line">    t_2 = threading.Thread(target=work_2)</span><br><span class="line">    t_2.start()</span><br><span class="line">    time.sleep(<span class="number">0.5</span>)<span class="comment">#sleep()控制了线程顺序</span></span><br><span class="line">    t_1.start()<span class="comment">#线程只能start一次</span></span><br><span class="line">    time.sleep(<span class="number">3</span>)</span><br><span class="line">    print(<span class="string">"num最后：%d\n"</span> %num)</span><br></pre></td></tr></table></figure>
-
-<p>通过运行结果，发现<code>work_2()</code>中的sleep(1)使得work_2的线程未执行完函数，num便被<code>work_1()</code>调用，所以work_1的num不是103；<br><br><br><img src="https://1j0ker.github.io/md_img/threading_1.jpg" alt="exmple1.md"><br><br></p>
-<h3 id="example2：多线程各自非顺序计算对全局变量的影响"><a href="#example2：多线程各自非顺序计算对全局变量的影响" class="headerlink" title="example2：多线程各自非顺序计算对全局变量的影响"></a>example2：多线程各自非顺序计算对全局变量的影响</h3><p><br>—————————————————————————-<br><strong>py代码：</strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">g_num = <span class="number">0</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_threading</span><span class="params">(num)</span>:</span></span><br><span class="line">    <span class="keyword">global</span> g_num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num):</span><br><span class="line">        g_num += <span class="number">1</span></span><br><span class="line">     </span><br><span class="line">    print(<span class="string">"work_threading ---- %d\n"</span> % g_num)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work</span><span class="params">(num)</span>:</span></span><br><span class="line">    <span class="keyword">global</span> g_num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num):</span><br><span class="line">        g_num += <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">    print(<span class="string">"work ---- %d\n"</span> % g_num)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">	print(<span class="string">"创建多线程之前g_num: %d"</span>%g_num)</span><br><span class="line"></span><br><span class="line">	t = threading.Thread(target=work_threading, args=(<span class="number">100000</span>,))</span><br><span class="line">	t.start()</span><br><span class="line">	<span class="comment">#time.sleep(1)</span></span><br><span class="line">	work(<span class="number">100000</span>)</span><br></pre></td></tr></table></figure>
-
-<p><em>看一下执行结果：</em></p>
-<p><img src="https://1j0ker.github.io/md_img/threading_val2.jpg" alt="exmple2.md"><br><br><br>&#8195;&#8195;能看到，每次执行结果都可能都不相同，原因就是，<code>work_threading()</code>线程调用时使其独自计算，代码继续下读，到<code>work()</code>导致在未完成完整的函数计算时，被双方调用的g_num可能是非最终结果（正常计算应该是100000），造成了最后参数的混乱不一；<br><em>（<code>work()</code>也可以是多线程函数，这里用普通循环函数，便于对比和理解）</em><br><br><br>可以在<code>work_threading()</code>和<code>work()</code>中添加<code>sleep()</code>,确保函数调用的按序进行，也就是example1中的<code>sleep()</code>影响全局变量原因；<br><br><br><img src="https://1j0ker.github.io/md_img/threading_val3.jpg" alt="exmple3.md"></p>
-<br>
---------------
-
-<h3 id="test-1-多线程探测主机"><a href="#test-1-多线程探测主机" class="headerlink" title="test_1:多线程探测主机"></a>test_1:多线程探测主机</h3><p><em>测试一下我所在的ip段</em></p>
-<p><strong>py代码：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">#-*- coding:utf-8 -*-</span><br><span class="line"></span><br><span class="line">import threading</span><br><span class="line">import time</span><br><span class="line">import os		#调用os模块，启动cmd</span><br><span class="line"></span><br><span class="line">code = os.popen(&apos;chcp 65001&apos;)#cmd的GBK编码问题，转成utf-8</span><br><span class="line"></span><br><span class="line">def Check_ip(ip):</span><br><span class="line">    cmd_ip = &apos;ping -n 1 xxx.xxx.xxx.&apos; + str(ip)	# -n 1仅仅探测一个回包，速度更快</span><br><span class="line">    #print(cmd_ip)</span><br><span class="line">    check = os.popen(cmd_ip)</span><br><span class="line">    data = check.read()</span><br><span class="line">    #print(data)</span><br><span class="line">    if &apos;TTL&apos; in data:</span><br><span class="line">        print(&apos;%s is UP\n&apos; % cmd_ip)</span><br><span class="line">    time.sleep(0.5)</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    for i in range(1,255):</span><br><span class="line">        t = threading.Thread(target=Check_ip, args=(i, ))</span><br><span class="line">        t.start()</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
-
-<p>&#8195;&#8195;结果能感觉到，速度明显的加快，打印下进程：</p>
-<p><img src="https://1j0ker.github.io/md_img/threading_checkip1.jpg" alt="exmple4.md"></p>
-<p>###To be continued…</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/15/py_threading/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-UTS安装时问题总结" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/12/UTS安装时问题总结/">UTS安装时问题总结</a>
-    </h1>
   
 
-        
-        <a href="/2019/07/12/UTS安装时问题总结/" class="archive-article-date">
-  	<time datetime="2019-07-12T12:39:30.332Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-12</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在学习UTS安装时，会遇到各种各样的问题，安装完成后，对各种出现的问题需要自我总结。</p>
-<h2 id="出现的问题及解决方案"><a href="#出现的问题及解决方案" class="headerlink" title="出现的问题及解决方案"></a>出现的问题及解决方案</h2><h3 id="一、DELL-R730-服务器"><a href="#一、DELL-R730-服务器" class="headerlink" title="一、DELL R730 服务器"></a>一、DELL R730 服务器</h3><h4 id="1-U盘安装centos-7-3："><a href="#1-U盘安装centos-7-3：" class="headerlink" title="1.    U盘安装centos 7.3："></a>1.    U盘安装centos 7.3：</h4><p>a)    DELL R730 F11进入BIOS，设置UEFI后，重启后再次进入F11，BIOS中选择从USB启动，开始安装Centos 7;</p>
-<p>b)    Centos 安装界面时，按e进入编辑，修改成正确的U盘名称：sd*，</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd /dev			#第一次无法查看，失败一次后，命令行查看自己的U盘名称</span><br></pre></td></tr></table></figure>
-
-<p>安装路径改为 </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">… … =hd: /dev/sd* quiet</span><br></pre></td></tr></table></figure>
-
-<p>c)    Centos 安装过程中，手动分区问题：</p>
-<pre><code>①确认正确的 File system 后，记得Update;
-
-②**/home**分区问题：有几块盘，就分几个**/home/sd*** 子目录，最后加上/home目录;</code></pre><p>d)    Centos安装完成后：强制常见User用户，建议系统启动后锁个屏，然后更换为/root用户登录；（防止UTS文件解压后，放入/home下，却发现实际在/home/User下，造成安装脚本的运行失败；</p>
-<h4 id="2-UTS-脚本配置："><a href="#2-UTS-脚本配置：" class="headerlink" title="2.    UTS 脚本配置："></a>2.    UTS 脚本配置：</h4><p>a)    UTS参数配置时，注意绑定的网卡(如<strong>em3</strong>)，后面选择透传网卡时不会再出现在选择列表；</p>
-<p>b)    在运行UTS安装脚本前，建议最大化终端，否则可能会出现分辨率显示不全问题；（在选择透传网卡）;</p>
-<p>c)    脚本安装完成后，提示<strong>reboot</strong>，再确认无error：后再重启；（syn…error脚本中语法错误可忽略）;</p>
-<p>d)    重启后：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">virsh list –all				#先确定uts_01是否runing</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">virsh console uts_01		#在开始控制UTS虚拟机</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="二、重点注意问题"><a href="#二、重点注意问题" class="headerlink" title="二、重点注意问题"></a>二、重点注意问题</h3><ol>
-<li>在执行UTS参数确定网卡安装脚本后，网卡与网桥绑定，不易卸载网桥；<br>（可进入/<strong>etc/sysconfig/network_config/vibr0</strong>处修改网桥ip）</li>
-</ol>
-<p>2    . 重装虚拟机：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a)	virsh shutdown uts_01		#关闭当前虚拟机uts_01</span><br><span class="line">	virsh undefine uts_01		#卸载现有虚拟机uts_01</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">b)	rm –r 现在虚拟机生成的.img		#删除uts_01生成的镜像文件；</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c)	重新执行安装脚本；</span><br></pre></td></tr></table></figure>
-
-<p>3    . 注意参数配置的，分配内存的大小，太大时，在UTS的web端进行系统或规则包升级时，容易造成卡死。重启UTS虚拟机；</p>
-<p>4    . 安装完成UTS后，web端访问无流量显示：</p>
-<pre><code>a)    查看接口信息，是否接口网桥未开启；
-b)    联动安装TAM，查看是否已有事件生成，如果有，则是可能是接口显示问题，建议联系开发查看；</code></pre>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/12/UTS安装时问题总结/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-py-spiders1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/11/py-spiders1/">Python爬虫闯关练习</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/11/py-spiders1/" class="archive-article-date">
-  	<time datetime="2019-07-11T10:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-11</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="Python爬虫闯关练习"><a href="#Python爬虫闯关练习" class="headerlink" title="Python爬虫闯关练习"></a>Python爬虫闯关练习</h1><p>黑板客爬虫闯关<a href="http://www.heibanke.com/lesson" target="_blank" rel="noopener">http://www.heibanke.com/lesson</a></p>
-<h2 id="第一关"><a href="#第一关" class="headerlink" title="第一关"></a>第一关</h2><h3 id="连续爬取数据并get传参"><a href="#连续爬取数据并get传参" class="headerlink" title="连续爬取数据并get传参"></a>连续爬取数据并get传参</h3><p>&#8195;<em>先试着输入几次参数，了解题目目标</em><br><img src="https://1j0ker.github.io/md_img/py_zj1.png" alt="exmple1.md"></p>
-<p><strong>思路：</strong>每次输入指定数字后会要求新的get参数，所以需要不断的匹配数字然后提交；<br>    利用模块<code>requests  和    re模块</code><br>这里查看网页源码，可以清晰的看到需要匹配的字段特征：<br><img src="https://1j0ker.github.io/md_img/py_zj2.png" alt="exmple2.md"></p>
-<hr>
-<p><strong>py代码：</strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line">url = <span class="string">'http://www.heibanke.com/lesson/crawler_ex00/'</span></span><br><span class="line">r = requests.get(url=url)</span><br><span class="line"></span><br><span class="line">numbers = re.findall(<span class="string">r'&lt;h3&gt;你需要在网址后输入数字([\d]&#123;5&#125;)'</span>,r.text)</span><br><span class="line"><span class="comment">#print(numbers)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> numbers:</span><br><span class="line">    url = <span class="string">'http://www.heibanke.com/lesson/crawler_ex00/%s/'</span> % numbers[<span class="number">0</span>]</span><br><span class="line">    print(url)</span><br><span class="line">    html = requests.get(url=url)</span><br><span class="line">    numbers = re.findall(<span class="string">r'数字是([\d]&#123;5&#125;)'</span>,html.text)<span class="comment">#通过更新数字，来判断循环的终止</span></span><br><span class="line">    <span class="keyword">print</span> (numbers)</span><br><span class="line"><span class="keyword">else</span>:    </span><br><span class="line">    print(html.text)<span class="comment">#最后过关的页面</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="最终密码：0第二关"><a href="#最终密码：0第二关" class="headerlink" title="最终密码：0第二关"></a><strong>最终密码：0</strong><br><br><br>第二关</h2><h3 id="POST型传参"><a href="#POST型传参" class="headerlink" title="POST型传参"></a>POST型传参</h3><p><img src="https://1j0ker.github.io/md_img/py_zj3.png" alt="exmple3.md"><br><em>随便输入尝试一下，发现报错信息：</em></p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>这里是黑板客爬虫闯关的第二关<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h3</span>&gt;</span>您输入的密码错误, 请重新输入<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p><br><br><br><strong>思路：</strong>正常的登录页面，很明显是<strong>POST</strong>传表单,再加上循环取值就行；<br>同样匹配判断是否包含错误信息，来终止循环；<br>使用模块<code>requests  和    re模块</code></p>
-<hr>
-<p><strong>py代码：</strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line">url = <span class="string">'http://www.heibanke.com/lesson/crawler_ex01/'</span></span><br><span class="line">html = requests.post(url=url, data=&#123;<span class="string">'username'</span>:<span class="string">'ads'</span>,<span class="string">'password'</span>:<span class="number">1</span>&#125;)</span><br><span class="line">char = re.findall(<span class="string">'密码错误'</span>,html.text)</span><br><span class="line">print(char)</span><br><span class="line"></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">for psd in range(30):</span></span><br><span class="line"><span class="string">    print (psd)</span></span><br><span class="line"><span class="string">    html = requests.post(url=url, data=&#123;'username':'ads','password':psd&#125;)</span></span><br><span class="line"><span class="string">    if '密码错误' not in html.text:</span></span><br><span class="line"><span class="string">        print('password =',psd)</span></span><br><span class="line"><span class="string">        break</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#2.while使用</span></span><br><span class="line">psd = <span class="number">-2</span></span><br><span class="line"><span class="keyword">while</span> char <span class="keyword">and</span> psd &lt; <span class="number">30</span>:</span><br><span class="line">    <span class="keyword">print</span> (psd)</span><br><span class="line">    html = requests.post(url=url, data=&#123;<span class="string">'username'</span>:<span class="string">'ads'</span>,<span class="string">'password'</span>:psd&#125;)</span><br><span class="line">    char = re.findall(<span class="string">'密码错误'</span>,html.text)</span><br><span class="line">    psd +=<span class="number">1</span></span><br><span class="line"><span class="keyword">print</span> (<span class="string">'password ='</span>,psd<span class="number">-1</span>)</span><br></pre></td></tr></table></figure>
-
-<p><strong>最终密码：4</strong></p>
-<hr>
-<p><br><br></p>
-<h2 id="第三关"><a href="#第三关" class="headerlink" title="第三关"></a>第三关</h2><h3 id="验证登录以及从爬虫保持Token访问"><a href="#验证登录以及从爬虫保持Token访问" class="headerlink" title="验证登录以及从爬虫保持Token访问"></a>验证登录以及从爬虫保持Token访问</h3><p><em>进入第三关的链接<a href="http://www.heibanke.com/lesson/crawler_ex02/" target="_blank" rel="noopener">http://www.heibanke.com/lesson/crawler_ex02/</a><br>但是跳转到了<code>login</code>登陆页面,一开始以为在线的题目出错了，但注册完在登陆进去之后，才明白题目确实是这样的要求：</em><br><img src="https://1j0ker.github.io/md_img/py_zj4.png" alt="exmple4.md"><br>注册登录后，发现题目：<br><img src="https://1j0ker.github.io/md_img/py_zj5.png" alt="exmple5.md"><br><br><br>和第二关很像，用第二关的代码改了下<code>url</code>在运行，出现了问题：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"summary"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">h1</span>&gt;</span>Forbidden <span class="tag">&lt;<span class="name">span</span>&gt;</span>(403)<span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">p</span>&gt;</span>CSRF verification failed. Request aborted.<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>发现了访问拒绝，又是<strong>POST</strong>包，这时候要去看一看<strong>request</strong>里面post哪些东西？<br><img src="https://1j0ker.github.io/md_img/py_zj6.png" alt="exmple6.md"><br>很明显多了个<code>token值</code>，再仔细查看，是<strong>request</strong>里cookies的这个值<code>csrftoken=2m7tnWxAV9Bm9lfFjWQ3vvCxAvY3qSxe;</code><br><br><br>那现在问题是这个token值是怎么获得的？经过一番F12是访问题目页面时，<strong>respond</strong>里的<code>Set-Cookie: csrftoken=2m7tnWxAV9Bm9lfFjWQ3vvCxAvY3qSxe;</code>由服务器发送给我们，用来验证接下来我们操作的身份；<br><br><br>也就是说，我们要在<strong>POST</strong>数据时，首先爬取<code>csrftoken</code>值，然后将<code>token</code>一同传过去；</p>
-<hr>
-<p>py代码(这次就没用<code>re</code>模块了)：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">url_1 = <span class="string">'http://www.heibanke.com/accounts/login'</span></span><br><span class="line">url_2 = <span class="string">'http://www.heibanke.com/lesson/crawler_ex02/'</span></span><br><span class="line">s = requests.Session()  <span class="comment">#创建会话，保存token</span></span><br><span class="line"></span><br><span class="line">s.get(url_1)</span><br><span class="line">token_1 = s.cookies[<span class="string">'csrftoken'</span>]<span class="comment">#get登录，拿到当前token</span></span><br><span class="line">print(token_1)</span><br><span class="line">data_1 = &#123;</span><br><span class="line">    <span class="string">'username'</span>: <span class="string">'efre'</span>,<span class="comment">#注册过的账号</span></span><br><span class="line">    <span class="string">'password'</span>: <span class="string">'123456123456'</span>,</span><br><span class="line">    <span class="string">'csrfmiddlewaretoken'</span>: token_1,</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">s.post(url_1,data=data_1)<span class="comment">#登录</span></span><br><span class="line"><span class="comment">#print(r.text)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">data_2 = &#123;</span><br><span class="line">    <span class="string">'username'</span>:<span class="string">'admin'</span>,</span><br><span class="line">    <span class="string">'password'</span>:<span class="number">0</span>,</span><br><span class="line">    <span class="string">'csrfmiddlewaretoken'</span>:<span class="string">''</span>,</span><br><span class="line">    &#125;</span><br><span class="line">s.post(url_2)<span class="comment">#获取题目页面的初始token值</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> pwd <span class="keyword">in</span> range(<span class="number">31</span>):</span><br><span class="line">    token_2 = s.cookies[<span class="string">'csrftoken'</span>]</span><br><span class="line">    data_2[<span class="string">'csrfmiddlewaretoken'</span>]=token_2</span><br><span class="line">    data_2[<span class="string">'password'</span>]=pwd</span><br><span class="line">    print(pwd,<span class="string">'+'</span>,token_2)<span class="comment">#查看当前密码和当前token值</span></span><br><span class="line">    html = s.post(url_2, data=data_2)</span><br><span class="line">    <span class="comment">#print(html.text)</span></span><br><span class="line">    <span class="keyword">if</span> <span class="string">'密码错误'</span> <span class="keyword">not</span> <span class="keyword">in</span> html.text:</span><br><span class="line">        <span class="comment">#print(html.text)</span></span><br><span class="line">        print(<span class="string">'password ='</span>,pwd)</span><br><span class="line">        <span class="keyword">break</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>最终密码：21</strong></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/11/py-spiders1/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
 
 
@@ -921,8 +421,8 @@ b)    联动安装TAM，查看是否已有事件生成，如果有，则是可�
     <script>
 	var yiliaConfig = {
 		mathjax: false,
-		isHome: true,
-		isPost: false,
+		isHome: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
