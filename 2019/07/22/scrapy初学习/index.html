@@ -6,20 +6,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>CSP的防护与绕过 | Hexo</title>
+  <title>Scrapy框架初学习 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="CSP的概念    CSP的前端防护 XSS向来是安全方面所重视的一大难题，虽然近年来在OWASP中下降了一些，但仍是实际生产环境中不可忽略的问题。 对于一个基本的XSS漏洞页面，它发生的原因往往是从用户输入的数据到输出没有有效的过滤，就比如下面的这个范例代码。 123&amp;lt;?php$a = $_GET[&apos;a&apos;];echo $a;  毫无过滤，我们可以很轻松的构造一种payload来实现XSS：">
+  <meta name="description" content="Scrapy框架 Scrapy是一个为了爬取网站数据，提取结构性数据而编写的应用框架。 其可以应用在数据挖掘，信息处理或存储历史数据等一系列的程序中。 其最初是为了页面抓取 (更确切来说, 网络抓取 )所设计的， 也可以应用在获取API所返回的数据(例如 Amazon Associates Web Services ) 或者通用的网络爬虫。Scrapy用途广泛，可以用于数据挖掘、监测和自动化测试。">
 <meta name="keywords" content="To be continued...">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CSP的防护与绕过">
-<meta property="og:url" content="http://yoursite.com/2019/07/20/CSP的防护与绕过/index.html">
+<meta property="og:title" content="Scrapy框架初学习">
+<meta property="og:url" content="http://yoursite.com/2019/07/22/scrapy初学习/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="CSP的概念    CSP的前端防护 XSS向来是安全方面所重视的一大难题，虽然近年来在OWASP中下降了一些，但仍是实际生产环境中不可忽略的问题。 对于一个基本的XSS漏洞页面，它发生的原因往往是从用户输入的数据到输出没有有效的过滤，就比如下面的这个范例代码。 123&amp;lt;?php$a = $_GET[&apos;a&apos;];echo $a;  毫无过滤，我们可以很轻松的构造一种payload来实现XSS：">
+<meta property="og:description" content="Scrapy框架 Scrapy是一个为了爬取网站数据，提取结构性数据而编写的应用框架。 其可以应用在数据挖掘，信息处理或存储历史数据等一系列的程序中。 其最初是为了页面抓取 (更确切来说, 网络抓取 )所设计的， 也可以应用在获取API所返回的数据(例如 Amazon Associates Web Services ) 或者通用的网络爬虫。Scrapy用途广泛，可以用于数据挖掘、监测和自动化测试。">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-07-22T14:41:53.587Z">
+<meta property="og:image" content="https://1j0ker.github.io/md_img/scrapy%E6%A1%86%E6%9E%B6_1.jpg">
+<meta property="og:image" content="https://1j0ker.github.io/md_img/scrapy%E6%A1%86%E6%9E%B6_2.jpg">
+<meta property="og:updated_time" content="2019-07-23T14:12:04.856Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="CSP的防护与绕过">
-<meta name="twitter:description" content="CSP的概念    CSP的前端防护 XSS向来是安全方面所重视的一大难题，虽然近年来在OWASP中下降了一些，但仍是实际生产环境中不可忽略的问题。 对于一个基本的XSS漏洞页面，它发生的原因往往是从用户输入的数据到输出没有有效的过滤，就比如下面的这个范例代码。 123&amp;lt;?php$a = $_GET[&apos;a&apos;];echo $a;  毫无过滤，我们可以很轻松的构造一种payload来实现XSS：">
+<meta name="twitter:title" content="Scrapy框架初学习">
+<meta name="twitter:description" content="Scrapy框架 Scrapy是一个为了爬取网站数据，提取结构性数据而编写的应用框架。 其可以应用在数据挖掘，信息处理或存储历史数据等一系列的程序中。 其最初是为了页面抓取 (更确切来说, 网络抓取 )所设计的， 也可以应用在获取API所返回的数据(例如 Amazon Associates Web Services ) 或者通用的网络爬虫。Scrapy用途广泛，可以用于数据挖掘、监测和自动化测试。">
+<meta name="twitter:image" content="https://1j0ker.github.io/md_img/scrapy%E6%A1%86%E6%9E%B6_1.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -155,113 +158,72 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-CSP的防护与绕过" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-scrapy初学习" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      CSP的防护与绕过
+      Scrapy框架初学习
     </h1>
   
 
         
-        <a href="/2019/07/20/CSP的防护与绕过/" class="archive-article-date">
-  	<time datetime="2019-07-20T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-20</time>
+        <a href="/2019/07/22/scrapy初学习/" class="archive-article-date">
+  	<time datetime="2019-07-22T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-22</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1>CSP的概念</h1>
+        <h3>Scrapy框架</h3>
+Scrapy是一个为了爬取网站数据，提取结构性数据而编写的应用框架。 其可以应用在数据挖掘，信息处理或存储历史数据等一系列的程序中。
+其最初是为了页面抓取 (更确切来说, 网络抓取 )所设计的， 也可以应用在获取API所返回的数据(例如 Amazon Associates Web Services ) 或者通用的网络爬虫。Scrapy用途广泛，可以用于数据挖掘、监测和自动化测试。
 
+<p>Scrapy 使用了 Twisted异步网络库来处理网络通讯。整体架构大致如下：<br><img src="https://1j0ker.github.io/md_img/scrapy%E6%A1%86%E6%9E%B6_1.jpg" alt="scrapy框架_1"></p>
+<h3> 实例</h3>
 
-<h3> CSP的前端防护</h3>
-XSS向来是安全方面所重视的一大难题，虽然近年来在OWASP中下降了一些，但仍是实际生产环境中不可忽略的问题。
-对于一个基本的XSS漏洞页面，它发生的原因往往是从用户输入的数据到输出没有有效的过滤，就比如下面的这个范例代码。
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$a = $_GET[<span class="string">'a'</span>];</span><br><span class="line"><span class="keyword">echo</span> $a;</span><br></pre></td></tr></table></figure>
-
-<p>毫无过滤，我们可以很轻松的构造一种payload来实现XSS：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a=&lt;script&gt;alert(1)&lt;/script&gt;</span><br><span class="line">a=&lt;img/src=1/onerror=alert(1)&gt;</span><br><span class="line">a=&lt;svg/onload=alert(1)&gt;</span><br></pre></td></tr></table></figure>
-
-<p>所以大多数会使用<code>htmlspecialchars</code>函数来过滤输入，或者更严格一些，使用<code>htmlspecialchars</code> + 黑名单的形式：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&amp; (AND) =&gt; &amp;amp;</span><br><span class="line">" (双引号) =&gt; &amp;quot; (当ENT_NOQUOTES没有设置的时候) </span><br><span class="line">' (单引号) =&gt; &amp;#039; (当ENT_QUOTES设置) </span><br><span class="line"><span class="tag">&lt; (小于号) =&gt;</span> &amp;lt; </span><br><span class="line">&gt; (大于号) =&gt; &amp;gt; </span><br><span class="line">...</span><br><span class="line">on\w+=</span><br><span class="line">script</span><br><span class="line">svg</span><br><span class="line">iframe</span><br><span class="line">link</span><br><span class="line">...</span><br><span class="line">% * + , – / ; <span class="tag">&lt; = &gt;</span> ^ | `</span><br></pre></td></tr></table></figure>
-
-<p>但是实际上的生产环境永远要比以前的多，XSS的插入点，可能是标签的属性，标签的值，标签的头部等等…</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"&#123;插入点&#125;"</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">"&#123;插入点&#125;"</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">"&#123;插入点&#125;"</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&#123;插入点&#125;</span>&gt;</span>(没有引号)</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span>&#123;插入点&#125;<span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>见过的那么多XSS漏洞，大多数漏洞的产生点，都是过滤函数忽略的地方。</strong></p>
-<h4>所以CSP诞生了：</h4>
-**CSP**是网页安全政策(Content Security Policy)的缩写。是一种由开发者定义的安全性政策申明，通过CSP所约束的责任指定可信的内容来源，（内容可以是指脚本、图片、style 等远程资源）。通过CSP协定，可以防止XSS攻击，让web处一个安全运行的环境中。
- CSP 的实质就是白名单制度，开发者明确告诉客户端，哪些外部资源可以加载和执行，等同于提供白名单。它的实现和执行全部由浏览器完成，开发者只需提供配置。CSP 大大增强了网页的安全性。攻击者即使发现了漏洞，也没法注入脚本，除非还控制了一台列入了白名单的可信主机。
-<br>
-**特点**就是他是在浏览器层面做的防护，是和同源策略同一级别，除非浏览器本身出现漏洞，否则不可能从机制上绕过。
-
-<p>CSP只允许被认可的JS块、JS文件、CSS等解析，只允许向指定的域发起请求。<br>一个简单的 HTTP 头信息CSP规则:</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">header("Content-Security-Policy: script-src 'self'; object-src 'none'; style-src cdn.example.org third-party.org; child-src https:");</span><br></pre></td></tr></table></figure>
-
-<p>其中的规则指令分很多种，每种指令都分管浏览器中请求的一部分，上面代码中，CSP 做了如下配置:</p>
+<p><strong>利用scrapy框架爬取糗事百科内容</strong>：</p>
 <ul>
-<li><p>脚本：只信任当前域名</p>
-</li>
-<li><p>object标签：不信任任何URL，即不加载任何资源</p>
-</li>
-<li><p>样式表：只信任cdn.example.org和third-party.org</p>
-</li>
-<li><p>框架（frame）：必须使用HTTPS协议加载</p>
-</li>
-<li><p>其他资源：没有限制</p>
-</li>
+<li>qsbk.py(spider.py)：</li>
 </ul>
-<p>启用后，不符合 CSP 的外部资源就会被阻止加载。<br><strong>详细的指令配置参考</strong>：<a href="https://content-security-policy.com" title="https://content-security-policy.com" target="_blank" rel="noopener">https://content-security-policy.com</a></p>
-<p>简单来说，针对不同来源，不同方式的资源加载，都有相应的加载策略。</p>
-<p>我们可以说，如果一个站点有足够严格的CSP规则，那么XSS or CSRF就可以从根源上被防止。</p>
-<p>但事实真的是这样吗？</p>
-<h3>CSP Bypass</h3>
-- 最普通最常见的CSP规则，只允许加载当前域的js:
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">header("Content-Security-Policy: default-src 'self'; script-src 'self' ");</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="keyword">from</span> scrapy.http.response.html <span class="keyword">import</span> HtmlResponse</span><br><span class="line"><span class="keyword">from</span> scrapy.selector.unified <span class="keyword">import</span> SelectorList</span><br><span class="line"><span class="keyword">from</span> test_1.items <span class="keyword">import</span> Test1Item<span class="comment">#把在items里定义的传输数据类型导入</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">QsbkSpiderSpider</span><span class="params">(scrapy.Spider)</span>:</span></span><br><span class="line">    name = <span class="string">'qsbk_spider'</span></span><br><span class="line">    allowed_domains = [<span class="string">'qiushibaike.com'</span>]</span><br><span class="line">    start_urls = [<span class="string">'https://www.qiushibaike.com/text/page/1/'</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        duanzidivs = response.xpath(<span class="string">"//div[@id='content-left']/div"</span>)</span><br><span class="line">        <span class="comment"># print('---'*40)</span></span><br><span class="line">        <span class="comment"># print(type(duanzidivs))#返回selectorList类型，可遍历</span></span><br><span class="line">        <span class="comment"># print('---'*40)</span></span><br><span class="line">        <span class="keyword">for</span> duanzidiv <span class="keyword">in</span> duanzidivs:</span><br><span class="line">            <span class="comment">#duanzidiv为selector类型，依旧可以使用xpath</span></span><br><span class="line">            author = duanzidiv.xpath(<span class="string">".//h2/text()"</span>).get().strip()<span class="comment">#.//在当前目录下寻找h2;get()将selector型数据转换成为unicode;strip()去除空格；</span></span><br><span class="line">            content = duanzidiv.xpath(<span class="string">".//div[@class='content']//text()"</span>).getall()<span class="comment">#getall()返回list型数据；</span></span><br><span class="line">            content = <span class="string">""</span>.join(content).strip()<span class="comment">#join()将List型数据转化为字符串</span></span><br><span class="line">            <span class="comment">#print(author, '\n')</span></span><br><span class="line">            <span class="comment">#print(content,'\n')</span></span><br><span class="line">            <span class="comment">#duanzi = &#123;"author":author, "content":content&#125;#创建一个字典</span></span><br><span class="line">            <span class="comment">#yield = duanzi</span></span><br><span class="line">            item = Test1Item(author=author, content=content)<span class="comment">#直接调用定义好的类型</span></span><br><span class="line">            <span class="keyword">yield</span> item<span class="comment">#yield 把普通函数变成生成器；</span></span><br></pre></td></tr></table></figure>
 
-<p><strong>但是！</strong>如果站内有上传图片的地方，如果我们上传一个内容为js的图片，图片就在网站的当前域下了：<br>那么直接加载图片：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">'upload/test.js'</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
+<p>这里的重点时<code>yield</code>，具体包含了scrapy爬虫的迭代运行 ：<a href="https://blog.csdn.net/qq_40695895/article/details/82882761" title="scrapy中 yield使用详解" target="_blank" rel="noopener">scrapy中 yield使用详解</a>；</p>
 <br>
-- 当你发现设置self并不安全的时候，可能会选择把静态文件的可信域限制到目录，看上去好像没什么问题了：
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">header(" Content-Security-Policy: default-src 'self '; script-src http://127.0.0.1/static/ ");</span><br></pre></td></tr></table></figure>
 
-<p>但是如果可信域内存在一个可控的重定向文件，那么CSP的目录限制就可以被绕过。</p>
-<p>假设static目录下存在一个302文件：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Static/302.php</span><br><span class="line"></span><br><span class="line">&lt;?php Header(&quot;location: &quot;.$_GET[&apos;url&apos;])?&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>利用scrapy的items的实例来传递参数，items.py：</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="comment"># Define here the models for your scraped items</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># See documentation in:</span></span><br><span class="line"><span class="comment"># https://docs.scrapy.org/en/latest/topics/items.html</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test1Item</span><span class="params">(scrapy.Item)</span>:</span></span><br><span class="line">    author = scrapy.Field()<span class="comment">#将需要传递的数据定义成类型；在spider里导入数据类型；</span></span><br><span class="line">    content = scrapy.Field()</span><br></pre></td></tr></table></figure>
 
-<p>首先上传一个内容为JS的上传一个test.jpg；<br>然后通过302.php跳转到upload目录加载js就可以成功执行：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"static/302.php?url=upload/test.js"</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-<br>
-- CSP除了阻止不可信js的解析以外，还有一个功能是组织向不可信域的请求:
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">header("Content-Security-Policy: default-src 'self'; script-src 'self' ");</span><br></pre></td></tr></table></figure>
+<p> 以及3种存储方式，比较优化，pipelines.py：</p>
+<p> 1.利用json模块，转换item；</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> io<span class="comment">#open莫名报错，使用io模块open</span></span><br><span class="line"><span class="comment">#1.利用json模块，转换item；</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test1Pipeline</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">         self.fp = io.open(<span class="string">'duanzi.json'</span>,<span class="string">'w'</span>,encoding=<span class="string">'utf-8'</span>)<span class="comment">#创建一个duanzi.json文件，写方式，可以在初始化函数中，也可以在open_spider()中</span></span><br><span class="line">     <span class="function"><span class="keyword">def</span> <span class="title">open_spider</span><span class="params">(self, spider)</span>:</span></span><br><span class="line">         print(<span class="string">"spider开始..."</span>)<span class="comment">#self.fp = open("duanzi.json",'w',encoding='utf-8')</span></span><br><span class="line">     <span class="function"><span class="keyword">def</span> <span class="title">process_item</span><span class="params">(self, item, spider)</span>:</span></span><br><span class="line">         item_json = json.dumps(dict(item), ensure_ascii=<span class="literal">False</span>)<span class="comment">#注意item要先转成程字典形式；把spider中传过来的duanzi转化成为json类型;ensure_ascii=False保存成中文</span></span><br><span class="line">         self.fp.write(item_json+<span class="string">'\n'</span>)<span class="comment">#将duanzi写入文件</span></span><br><span class="line">         <span class="keyword">return</span> item</span><br><span class="line">     <span class="function"><span class="keyword">def</span> <span class="title">close_spider</span><span class="params">(self, spider)</span>:</span></span><br><span class="line">         self.fp.close()<span class="comment">#关闭文件</span></span><br><span class="line">         print(<span class="string">"spider结束"</span>)</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">"http://lorexxar.cn/1.jpg"</span>&gt;</span> #尝试加载域外图片，被阻止</span><br></pre></td></tr></table></figure>
+<p>2.使用exporters.JsonItemExporter模块，bytes写入;结果一个列表内放所有字典：先将item数据放入内存中，但item过大时，消耗内存</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#-*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">from</span> scrapy.exporters <span class="keyword">import</span> JsonItemExporter</span><br><span class="line"><span class="comment">#2.使用exporters.JsonItemExporter模块，bytes写入;结果一个列表内放所有字典：先将item数据放入内存中，item过大时，消耗内存</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test1Pipeline</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.fp = io.open(<span class="string">'duanzi.json'</span>,<span class="string">'wb'</span>)<span class="comment">#创建一个duanzi.json文件，二进制写方式，二进制方法就没有编码了</span></span><br><span class="line">        self.exporter = JsonItemExporter(self.fp,ensure_ascii=<span class="literal">False</span>,encoding=<span class="string">'utf-8'</span>)</span><br><span class="line">        self.exporter.start_exporting()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">open_spider</span><span class="params">(self, spider)</span>:</span></span><br><span class="line">        print(<span class="string">"spider开始..."</span>)<span class="comment">#self.fp = io.open('duanzi.json','wb')</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_item</span><span class="params">(self, item, spider)</span>:</span></span><br><span class="line">        self.exporter.export_item(item)</span><br><span class="line">        <span class="keyword">return</span> item</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">close_spider</span><span class="params">(self, spider)</span>:</span></span><br><span class="line">        self.exporter.finish_exporting()</span><br><span class="line">        self.fp.close()<span class="comment">#关闭文件</span></span><br><span class="line">        print(<span class="string">"spider结束"</span>)</span><br></pre></td></tr></table></figure>
 
-<p>但是在CSP1.0中，对于link的限制并不完整，不同浏览器包括chrome和firefox对CSP的支持都不完整，每个浏览器都维护一份包括CSP1.0、部分CSP2.0、少部分CSP3.0的CSP规则：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"prefetch"</span> <span class="attr">href</span>=<span class="string">"http://lorexxar.cn"</span>&gt;</span> #(H5预加载)(only chrome)</span><br><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"dns-prefetch"</span> <span class="attr">href</span>=<span class="string">"http://lorexxar.cn"</span>&gt;</span> #（DNS预加载）</span><br></pre></td></tr></table></figure>
+<p>3.使用exporters.JsonLinesItemExporter模块，bytes写入;结果一个字典一行,清晰安全不占用内存：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#-*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">from</span> scrapy.exporters <span class="keyword">import</span> JsonLinesItemExporter</span><br><span class="line"><span class="comment">#3.使用exporters.JsonLinesItemExporter模块，bytes写入;结果一个字典一行</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test1Pipeline</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.fp = io.open(<span class="string">'duanzi.json'</span>,<span class="string">'wb'</span>)<span class="comment">#创建一个duanzi.json文件，二进制写方式，二进制方法就没有编码了</span></span><br><span class="line">        self.exporter = JsonLinesItemExporter(self.fp,ensure_ascii=<span class="literal">False</span>,encoding=<span class="string">'utf-8'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">open_spider</span><span class="params">(self, spider)</span>:</span></span><br><span class="line">        print(<span class="string">"spider开始..."</span>)<span class="comment">#self.fp = io.open('duanzi.json','wb')</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_item</span><span class="params">(self, item, spider)</span>:</span></span><br><span class="line">        self.exporter.export_item(item)</span><br><span class="line">        <span class="keyword">return</span> item</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">close_spider</span><span class="params">(self, spider)</span>:</span></span><br><span class="line">        self.fp.close()<span class="comment">#关闭文件</span></span><br><span class="line">        print(<span class="string">"spider结束"</span>)</span><br></pre></td></tr></table></figure>
 
-<p>都会造成域外加载；<br><br></p>
-<p>还有很多类似jsonp和CSP相冲突的组件，造成了CSP无法完全的限制安全域，或者说控制安全域内的资源真正来源是否安全… …<br><br><br>当然随着CSP的升级，一些域控问题得到改善，但有些问题还是无法解决：<br>最要命的，比如：<strong>dom xss</strong>;</p>
-<h5>DOM XSS</h5>
-现代浏览器大多都有缓存机制，但页面中没有修改或者不需要再次请求后台的时候，浏览器就会从缓存中读取页面内容，`location.hash`就是一个典型的例子；
+<ul>
+<li>settings.py的参数不要忘记设置：</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ROBOTSTXT_OBEY = <span class="literal">False</span><span class="comment">#关闭查找robottxt页面</span></span><br></pre></td></tr></table></figure>
 
-<p>如果JS中存在操作location.hash导致的xss，那么这样的攻击请求不会经过后台；<br>或者通过通过CSS选择器来读取页面内容，页面只变化了CSS，构造纯静态的XSS，不过CSP筛选：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">*<span class="selector-attr">[attribute^="a"]</span>&#123;<span class="attribute">background</span>:<span class="built_in">url</span>(<span class="string">"record?match=a"</span>)&#125; </span><br><span class="line">*<span class="selector-attr">[attribute^="b"]</span>&#123;<span class="attribute">background</span>:<span class="built_in">url</span>(<span class="string">"record?match=b"</span>)&#125; </span><br><span class="line">*<span class="selector-attr">[attribute^="c"]</span>&#123;<span class="attribute">background</span>:<span class="built_in">url</span>(<span class="string">"record?match=c"</span>)&#125; <span class="selector-attr">[...]</span></span><br></pre></td></tr></table></figure>
 
-<p>当匹配到对应的属性，页面就会发出相应的请求。<br>上面是常见的3种绕过；<br><a href="https://paper.seebug.org/423/#0x03-csp-bypass" title="更多绕过的方法。" target="_blank" rel="noopener">更多绕过方法。</a></p>
-<h3>总结</h3>
-CSP虽然有着严格的白名单控制，但仍然只能减轻以偷取信息为目的的XSS行为，对于纯粹的破坏行为则无能为力，特别是DOM Based XSS，所以对于防范XSS还是需要数据的输入校验以及数据输出的Encode，前端浏览器与后端Nginx，Apache的共同协作；
 
-<h5>ref:</h5>
-[1] [https://paper.seebug.org/91/](https://paper.seebug.org/91/ "https://paper.seebug.org/91")
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"> DEFAULT_REQUEST_HEADERS = &#123;</span><br><span class="line">   <span class="string">'Accept'</span>: <span class="string">'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'</span>,</span><br><span class="line">   <span class="string">'Accept-Language'</span>: <span class="string">'en'</span>,</span><br><span class="line">    <span class="string">'User-Agent'</span>:<span class="string">'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0'</span></span><br><span class="line">&#125;<span class="comment">#设置常用头信息</span></span><br></pre></td></tr></table></figure>
 
-<p>[2] <a href="https://lorexxar.cn" title="https://lorexxar.cn" target="_blank" rel="noopener">https://lorexxar.cn</a></p>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> ITEM_PIPELINES = &#123;</span><br><span class="line">   <span class="string">'test_1.pipelines.Test1Pipeline'</span>: <span class="number">300</span>,<span class="comment">#值越小越先执行</span></span><br><span class="line">&#125;<span class="comment">#开启pipelines</span></span><br></pre></td></tr></table></figure>
+
+
+<p><strong>效果：</strong><br>爬取的数据被存放在duanzi.json中：<br><img src="https://1j0ker.github.io/md_img/scrapy%E6%A1%86%E6%9E%B6_2.jpg" alt="scrapy框架_2"></p>
 
       
 
@@ -352,7 +314,7 @@ CSP虽然有着严格的白名单控制，但仍然只能减轻以偷取信息�
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/07/20/CSP的防护与绕过/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/07/22/scrapy初学习/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -366,18 +328,9 @@ CSP虽然有着严格的白名单控制，但仍然只能减轻以偷取信息�
   
 <nav id="article-nav">
   
-    <a href="/2019/07/22/scrapy初学习/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          Scrapy框架初学习
-        
-      </div>
-    </a>
   
-  
-    <a href="/2019/07/17/XFFsearch_real_ip/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">寻找 X-Forwarded-For 的真实IP的一些理解(续)</div>
+    <a href="/2019/07/20/CSP的防护与绕过/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">CSP的防护与绕过</div>
       <i class="icon-circle-right"></i>
     </a>
   
