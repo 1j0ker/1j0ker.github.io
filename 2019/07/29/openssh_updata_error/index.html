@@ -6,15 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Tag: To be continued... | Hexo</title>
+  <title>centos7 升级openssh 的踩坑记录 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/tags/To-be-continued/index.html">
+  <meta name="description" content="centos7 升级openssh到openssh-8.0p1版本    一、警惕 rm -rf   因为项目需求，在远程升级服务器openssh时遇到了一些问题，在把升级所需要的一些依赖包打上去之前，先把openssl的一些东西给删了，导致服务器ssh出现了问题。幸好之前开了telnet服务，还能连上后台。 可这问题并没有解决，openssl的删除，导致yum也无法使用，而telnet远程上传文">
+<meta name="keywords" content="To be continued...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="centos7 升级openssh 的踩坑记录">
+<meta property="og:url" content="http://yoursite.com/2019/07/29/openssh_updata_error/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="centos7 升级openssh到openssh-8.0p1版本    一、警惕 rm -rf   因为项目需求，在远程升级服务器openssh时遇到了一些问题，在把升级所需要的一些依赖包打上去之前，先把openssl的一些东西给删了，导致服务器ssh出现了问题。幸好之前开了telnet服务，还能连上后台。 可这问题并没有解决，openssl的删除，导致yum也无法使用，而telnet远程上传文">
 <meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-07-30T15:09:11.909Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo">
+<meta name="twitter:title" content="centos7 升级openssh 的踩坑记录">
+<meta name="twitter:description" content="centos7 升级openssh到openssh-8.0p1版本    一、警惕 rm -rf   因为项目需求，在远程升级服务器openssh时遇到了一些问题，在把升级所需要的一些依赖包打上去之前，先把openssl的一些东西给删了，导致服务器ssh出现了问题。幸好之前开了telnet服务，还能连上后台。 可这问题并没有解决，openssl的删除，导致yum也无法使用，而telnet远程上传文">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -150,36 +155,88 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
+            <article id="post-openssh_updata_error" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
+    <h1 class="article-title" itemprop="name">
+      centos7 升级openssh 的踩坑记录
+    </h1>
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/29/crawl_spider/" class="archive-article-date">
+
+        
+        <a href="/2019/07/29/openssh_updata_error/" class="archive-article-date">
   	<time datetime="2019-07-29T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-29</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/29/crawl_spider/">Crawl_spider模块</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2>centos7 升级openssh到openssh-8.0p1版本</h2>
 
-        <div class="article-info info-on-right">
-          
+
+<h4>
+一、警惕 rm -rf
+</h4>
+
+<p>因为项目需求，在远程升级服务器openssh时遇到了一些问题，在把升级所需要的一些依赖包打上去之前，先把<code>openssl</code>的一些东西给删了，导致服务器ssh出现了问题。幸好之前开了<code>telnet</code>服务，还能连上后台。</p>
+<p>可这问题并没有解决，<code>openssl</code>的删除，导致<code>yum</code>也无法使用，而<code>telnet</code>远程上传文件又不想ssh 的<code>scp</code>那么方便。</p>
+<p>所以最后还是要到机房，上U盘，所幸机房离我不远。<br><strong>如果远程操作，对于 删除操作 一定要慎重又慎重，最好cp备份一下。</strong></p>
+<h4>
+二、fdisk 看盘名称问题
+</h4>
+
+<p>没错，这个我都能踩坑：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Disk /dev/sdh: 15.5 GB, 15474836480 bytes</span><br><span class="line">255 heads, 63 sectors/track, 2610 cylinders</span><br><span class="line">Units = cylinders of 16065 * 512 = 8225280 bytes</span><br><span class="line">Sector size (logical/physical): 512 bytes / 512 bytes</span><br><span class="line">I/O size (minimum/optimal): 512 bytes / 512 bytes</span><br><span class="line">Disk identifier: 0xe8517189</span><br><span class="line"> </span><br><span class="line">   Device Boot      Start         End      Blocks   Id  System</span><br><span class="line">/dev/sdh4               1        2610    20964793+   5  Extended</span><br></pre></td></tr></table></figure>
+
+<p>上机房插上U盘后，直接<code>fdisk</code>找一下盘的名字，我只读了第一行<code>sdh</code>，看到容量差不多，是我的盘，然后<code>mount</code>挂载就出了问题，一直报：写保护error</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost mnt]# mount /dev/sdh /mnt/data1/</span><br><span class="line">mount: block device /dev/sdh is write-protected, mounting read-only</span><br><span class="line">mount: cannot mount block device /dev/sdh read-only</span><br></pre></td></tr></table></figure>
+
+<p>这我人傻了，我U盘怎么就写保护了？难道是因为我U盘 FAT32的问题，我又去找了相应的挂载指令：<code>[root@localhost mnt]# mount -t vfat /dev/sdh /mnt/data1</code><br>还是不行，依旧 写保护 报错；</p>
+<p>最后才发现时真的U盘写错了… … 在Device 下面才是U盘的名称<code>sdh4</code>;<br>明明之前重装Centos7 的时候还在edit模式下看到过的<code>device</code>名称；<br><strong>注意 fdisk 的方法吧。</strong></p>
+<h4>
+三、重要文件备份一定做好
+</h4>
+
+<p>依赖包打上去了以后，剩下的就是按步骤安装、写配置、编译就完了。这里有个坑就是<code>/etc/ssh/sshd_config</code>这个文件一定要实现备份好。<br>因为在操作中要首先<strong>删除</strong>这些原有的配置文件（对于删除操作的慎重），而且备份后方便去替代编译make以后那个新生成的sshd_config配置文件，不用很麻烦的去修改内容，各台服务器有各台服务器的环境，真的容易出错；</p>
+<p>之后还有记得删除原 <code>/root/.ssh/ known_hosts</code>的内容；因为升级之后远程连接主机发现密匙发生变化，需要去重新获取。</p>
+<h5>
+To Be Continue... ...
+</h5>
+
+<p>升级完了openssh之后，web链接出现了问题，初步判断时443挂了，问题还在排查… …<br>（PS：不是运维的运维踩坑记录）</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -191,285 +248,115 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/07/29/openssh_updata_error/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/29/openssh_updata_error/" class="archive-article-date">
-  	<time datetime="2019-07-29T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-29</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/2019/07/29/crawl_spider/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          Crawl_spider模块
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/07/22/scrapy初学习/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Scrapy框架初学习</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/29/openssh_updata_error/">centos7 升级openssh 的踩坑记录</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/22/scrapy初学习/" class="archive-article-date">
-  	<time datetime="2019-07-22T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-22</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/22/scrapy初学习/">Scrapy框架初学习</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/20/CSP的防护与绕过/" class="archive-article-date">
-  	<time datetime="2019-07-20T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-20</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/20/CSP的防护与绕过/">CSP的防护与绕过</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/17/XFFsearch_real_ip/" class="archive-article-date">
-  	<time datetime="2019-07-17T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-17</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/17/XFFsearch_real_ip/">寻找 X-Forwarded-For 的真实IP的一些理解(续)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/15/X-Forward-f/" class="archive-article-date">
-  	<time datetime="2019-07-15T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-15</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/15/X-Forward-f/">X-Forwarded-For 和 X-Real-IP 的一些理解与区别</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/15/py_threading/" class="archive-article-date">
-  	<time datetime="2019-07-15T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-15</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/15/py_threading/">Python多线程的变量影响</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/11/py-spiders1/" class="archive-article-date">
-  	<time datetime="2019-07-11T10:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-11</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/11/py-spiders1/">Python爬虫闯关练习</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
 
 
           </div>
@@ -492,9 +379,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
