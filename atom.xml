@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-07-29T14:38:08.530Z</updated>
+  <updated>2019-07-30T15:19:21.482Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,36 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>centos7 升级openssh 的踩坑记录</title>
+    <link href="http://yoursite.com/2019/07/30/openssh_updata_error/"/>
+    <id>http://yoursite.com/2019/07/30/openssh_updata_error/</id>
+    <published>2019-07-30T14:02:17.000Z</published>
+    <updated>2019-07-30T15:19:21.482Z</updated>
+    
+    <content type="html"><![CDATA[<h2>centos7 升级openssh到openssh-8.0p1版本</h2><h4>一、警惕 rm -rf</h4><p>因为项目需求，在远程升级服务器openssh时遇到了一些问题，在把升级所需要的一些依赖包打上去之前，先把<code>openssl</code>的一些东西给删了，导致服务器ssh出现了问题。幸好之前开了<code>telnet</code>服务，还能连上后台。</p><p>可这问题并没有解决，<code>openssl</code>的删除，导致<code>yum</code>也无法使用，而<code>telnet</code>远程上传文件又不想ssh 的<code>scp</code>那么方便。</p><p>所以最后还是要到机房，上U盘，所幸机房离我不远。<br><strong>如果远程操作，对于 删除操作 一定要慎重又慎重，最好cp备份一下。</strong></p><h4>二、fdisk 看盘名称问题</h4><p>没错，这个我都能踩坑：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Disk /dev/sdh: 15.5 GB, 15474836480 bytes</span><br><span class="line">255 heads, 63 sectors/track, 2610 cylinders</span><br><span class="line">Units = cylinders of 16065 * 512 = 8225280 bytes</span><br><span class="line">Sector size (logical/physical): 512 bytes / 512 bytes</span><br><span class="line">I/O size (minimum/optimal): 512 bytes / 512 bytes</span><br><span class="line">Disk identifier: 0xe8517189</span><br><span class="line"> </span><br><span class="line">   Device Boot      Start         End      Blocks   Id  System</span><br><span class="line">/dev/sdh4               1        2610    20964793+   5  Extended</span><br></pre></td></tr></table></figure><p>上机房插上U盘后，直接<code>fdisk</code>找一下盘的名字，我只读了第一行<code>sdh</code>，看到容量差不多，是我的盘，然后<code>mount</code>挂载就出了问题，一直报：写保护error</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost mnt]# mount /dev/sdh /mnt/data1/</span><br><span class="line">mount: block device /dev/sdh is write-protected, mounting read-only</span><br><span class="line">mount: cannot mount block device /dev/sdh read-only</span><br></pre></td></tr></table></figure><p>这我人傻了，我U盘怎么就写保护了？难道是因为我U盘 FAT32的问题，我又去找了相应的挂载指令：<code>[root@localhost mnt]# mount -t vfat /dev/sdh /mnt/data1</code><br>还是不行，依旧 写保护 报错；</p><p>最后才发现时真的U盘写错了… … 在Device 下面才是U盘的名称<code>sdh4</code>;<br>明明之前重装Centos7 的时候还在edit模式下看到过的<code>device</code>名称；<br><strong>注意 fdisk 的方法吧。</strong></p><h4>三、重要文件备份一定做好</h4><p>依赖包打上去了以后，剩下的就是按步骤安装、写配置、编译就完了。这里有个坑就是<code>/etc/ssh/sshd_config</code>这个文件一定要实现备份好。<br>因为在操作中要首先<strong>删除</strong>这些原有的配置文件（对于删除操作的慎重），而且备份后方便去替代编译make以后那个新生成的sshd_config配置文件，不用很麻烦的去修改内容，各台服务器有各台服务器的环境，真的容易出错；</p><p>之后还有记得删除原 <code>/root/.ssh/ known_hosts</code>的内容；因为升级之后远程连接主机发现密匙发生变化，需要去重新获取。</p><h5>To Be Continue... ...</h5><p>升级完了openssh之后，web链接出现了问题，初步判断时443挂了，问题还在排查… …<br>（PS：不是运维的运维踩坑记录）</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2&gt;centos7 升级openssh到openssh-8.0p1版本&lt;/h2&gt;
+
+
+&lt;h4&gt;
+一、警惕 rm -rf
+&lt;/h4&gt;
+
+&lt;p&gt;因为项目需求，在远程升级服务器openssh时遇到了一些问题，在把升级所需要的一些依赖包打上去之前，先把&lt;code&gt;openssl&lt;/c
+      
+    
+    </summary>
+    
+    
+      <category term="To be continued..." scheme="http://yoursite.com/tags/To-be-continued/"/>
+    
+  </entry>
   
   <entry>
     <title>Crawl_spider模块</title>
@@ -32,36 +62,6 @@
         &lt;h3&gt;Crawl_spider&lt;/h3&gt;
 
 &lt;p&gt;CrawlSpider也继承自Spider，所以具备它的所有特性，这些特性上章已经讲过了，就再在赘述了，这章就讲点它本身所独有的。&lt;br&gt;&lt;code&gt;crawlspider&lt;/code&gt;比传统spider更加简便、智能；我们网站
-      
-    
-    </summary>
-    
-    
-      <category term="To be continued..." scheme="http://yoursite.com/tags/To-be-continued/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>centos7 升级openssh 的踩坑记录</title>
-    <link href="http://yoursite.com/2019/07/29/openssh_updata_error/"/>
-    <id>http://yoursite.com/2019/07/29/openssh_updata_error/</id>
-    <published>2019-07-29T14:02:17.000Z</published>
-    <updated>2019-07-30T15:09:11.909Z</updated>
-    
-    <content type="html"><![CDATA[<h2>centos7 升级openssh到openssh-8.0p1版本</h2><h4>一、警惕 rm -rf</h4><p>因为项目需求，在远程升级服务器openssh时遇到了一些问题，在把升级所需要的一些依赖包打上去之前，先把<code>openssl</code>的一些东西给删了，导致服务器ssh出现了问题。幸好之前开了<code>telnet</code>服务，还能连上后台。</p><p>可这问题并没有解决，<code>openssl</code>的删除，导致<code>yum</code>也无法使用，而<code>telnet</code>远程上传文件又不想ssh 的<code>scp</code>那么方便。</p><p>所以最后还是要到机房，上U盘，所幸机房离我不远。<br><strong>如果远程操作，对于 删除操作 一定要慎重又慎重，最好cp备份一下。</strong></p><h4>二、fdisk 看盘名称问题</h4><p>没错，这个我都能踩坑：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Disk /dev/sdh: 15.5 GB, 15474836480 bytes</span><br><span class="line">255 heads, 63 sectors/track, 2610 cylinders</span><br><span class="line">Units = cylinders of 16065 * 512 = 8225280 bytes</span><br><span class="line">Sector size (logical/physical): 512 bytes / 512 bytes</span><br><span class="line">I/O size (minimum/optimal): 512 bytes / 512 bytes</span><br><span class="line">Disk identifier: 0xe8517189</span><br><span class="line"> </span><br><span class="line">   Device Boot      Start         End      Blocks   Id  System</span><br><span class="line">/dev/sdh4               1        2610    20964793+   5  Extended</span><br></pre></td></tr></table></figure><p>上机房插上U盘后，直接<code>fdisk</code>找一下盘的名字，我只读了第一行<code>sdh</code>，看到容量差不多，是我的盘，然后<code>mount</code>挂载就出了问题，一直报：写保护error</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost mnt]# mount /dev/sdh /mnt/data1/</span><br><span class="line">mount: block device /dev/sdh is write-protected, mounting read-only</span><br><span class="line">mount: cannot mount block device /dev/sdh read-only</span><br></pre></td></tr></table></figure><p>这我人傻了，我U盘怎么就写保护了？难道是因为我U盘 FAT32的问题，我又去找了相应的挂载指令：<code>[root@localhost mnt]# mount -t vfat /dev/sdh /mnt/data1</code><br>还是不行，依旧 写保护 报错；</p><p>最后才发现时真的U盘写错了… … 在Device 下面才是U盘的名称<code>sdh4</code>;<br>明明之前重装Centos7 的时候还在edit模式下看到过的<code>device</code>名称；<br><strong>注意 fdisk 的方法吧。</strong></p><h4>三、重要文件备份一定做好</h4><p>依赖包打上去了以后，剩下的就是按步骤安装、写配置、编译就完了。这里有个坑就是<code>/etc/ssh/sshd_config</code>这个文件一定要实现备份好。<br>因为在操作中要首先<strong>删除</strong>这些原有的配置文件（对于删除操作的慎重），而且备份后方便去替代编译make以后那个新生成的sshd_config配置文件，不用很麻烦的去修改内容，各台服务器有各台服务器的环境，真的容易出错；</p><p>之后还有记得删除原 <code>/root/.ssh/ known_hosts</code>的内容；因为升级之后远程连接主机发现密匙发生变化，需要去重新获取。</p><h5>To Be Continue... ...</h5><p>升级完了openssh之后，web链接出现了问题，初步判断时443挂了，问题还在排查… …<br>（PS：不是运维的运维踩坑记录）</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h2&gt;centos7 升级openssh到openssh-8.0p1版本&lt;/h2&gt;
-
-
-&lt;h4&gt;
-一、警惕 rm -rf
-&lt;/h4&gt;
-
-&lt;p&gt;因为项目需求，在远程升级服务器openssh时遇到了一些问题，在把升级所需要的一些依赖包打上去之前，先把&lt;code&gt;openssl&lt;/c
       
     
     </summary>
