@@ -480,6 +480,106 @@ To Be Continue... ...
 
 
   
+    <article id="post-Crawl_spider" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/29/Crawl_spider/">Crawl_spider模块</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/29/Crawl_spider/" class="archive-article-date">
+  	<time datetime="2019-07-29T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-29</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2>Crawl_spider</h2>
+
+<p><code>CrawlSpider</code>也继承自<code>Spider</code>，所以具备它的所有特性，这些特性上章已经讲过了，就再在赘述了，这章就讲点它本身所独有的。<br>crawlspider比传统spider更加简便、智能；我们网站的url都是有一定规则的，像django，在<code>view</code>中定义的<code>urls</code>规则就是正则表示的。那么就可以根据这个特性来设计爬虫，而不是每次都要用spider分析页面格式，拆解源码，scrapy提供了CrawlSpider处理此需求。</p>
+<p>看看CrawlSpider类的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CrawlSpider</span><span class="params">(Spider)</span>:</span></span><br><span class="line"></span><br><span class="line">    rules = ()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, *a, **kw)</span>:</span></span><br><span class="line">        super(CrawlSpider, self).__init__(*a, **kw)</span><br><span class="line">        self._compile_rules()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self._parse_response(response, self.parse_start_url, cb_kwargs=&#123;&#125;, follow=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse_start_url</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> []</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_results</span><span class="params">(self, response, results)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> results</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_build_request</span><span class="params">(self, rule, link)</span>:</span></span><br><span class="line">        r = Request(url=link.url, callback=self._response_downloaded)</span><br><span class="line">        r.meta.update(rule=rule, link_text=link.text)</span><br><span class="line">        <span class="keyword">return</span> r</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_requests_to_follow</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> isinstance(response, HtmlResponse):</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        seen = set()</span><br><span class="line">        <span class="keyword">for</span> n, rule <span class="keyword">in</span> enumerate(self._rules):</span><br><span class="line">            links = [lnk <span class="keyword">for</span> lnk <span class="keyword">in</span> rule.link_extractor.extract_links(response)</span><br><span class="line">                     <span class="keyword">if</span> lnk <span class="keyword">not</span> <span class="keyword">in</span> seen]</span><br><span class="line">            <span class="keyword">if</span> links <span class="keyword">and</span> rule.process_links:</span><br><span class="line">                links = rule.process_links(links)</span><br><span class="line">            <span class="keyword">for</span> link <span class="keyword">in</span> links:</span><br><span class="line">                seen.add(link)</span><br><span class="line">                r = self._build_request(n, link)</span><br><span class="line">                <span class="keyword">yield</span> rule.process_request(r)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_response_downloaded</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        rule = self._rules[response.meta[<span class="string">'rule'</span>]]</span><br><span class="line">        <span class="keyword">return</span> self._parse_response(response, rule.callback, rule.cb_kwargs, rule.follow)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_parse_response</span><span class="params">(self, response, callback, cb_kwargs, follow=True)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> callback:</span><br><span class="line">            cb_res = callback(response, **cb_kwargs) <span class="keyword">or</span> ()</span><br><span class="line">            cb_res = self.process_results(response, cb_res)</span><br><span class="line">            <span class="keyword">for</span> requests_or_item <span class="keyword">in</span> iterate_spider_output(cb_res):</span><br><span class="line">                <span class="keyword">yield</span> requests_or_item</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> follow <span class="keyword">and</span> self._follow_links:</span><br><span class="line">            <span class="keyword">for</span> request_or_item <span class="keyword">in</span> self._requests_to_follow(response):</span><br><span class="line">                <span class="keyword">yield</span> request_or_item</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_compile_rules</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">get_method</span><span class="params">(method)</span>:</span></span><br><span class="line">            <span class="keyword">if</span> callable(method):</span><br><span class="line">                <span class="keyword">return</span> method</span><br><span class="line">            <span class="keyword">elif</span> isinstance(method, six.string_types):</span><br><span class="line">                <span class="keyword">return</span> getattr(self, method, <span class="literal">None</span>)</span><br><span class="line"></span><br><span class="line">        self._rules = [copy.copy(r) <span class="keyword">for</span> r <span class="keyword">in</span> self.rules]</span><br><span class="line">        <span class="keyword">for</span> rule <span class="keyword">in</span> self._rules:</span><br><span class="line">            rule.callback = get_method(rule.callback)</span><br><span class="line">            rule.process_links = get_method(rule.process_links)</span><br><span class="line">            rule.process_request = get_method(rule.process_request)</span><br><span class="line"></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">from_crawler</span><span class="params">(cls, crawler, *args, **kwargs)</span>:</span></span><br><span class="line">        spider = super(CrawlSpider, cls).from_crawler(crawler, *args, **kwargs)</span><br><span class="line">        spider._follow_links = crawler.settings.getbool(</span><br><span class="line">            <span class="string">'CRAWLSPIDER_FOLLOW_LINKS'</span>, <span class="literal">True</span>)</span><br><span class="line">        <span class="keyword">return</span> spider</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">set_crawler</span><span class="params">(self, crawler)</span>:</span></span><br><span class="line">        super(CrawlSpider, self).set_crawler(crawler)</span><br><span class="line">        self._follow_links = crawler.settings.getbool(<span class="string">'CRAWLSPIDER_FOLLOW_LINKS'</span>, <span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+
+<p><strong>其中的方法很多而且很详细，这里先介绍三种主要常用的方法：</strong></p>
+<p><strong>rules：</strong><br>它是一个列表，存储的元素时<code>Rule</code>类的实例，其中每一个实例都定义了一种采集站点的行为。如果有多个<code>rule</code>都匹配同一个链接，那么位置下标最小的一个<code>rule</code>将会被使用。 CrawlSpider本身有去重的行为。</p>
+<p><strong>callback：</strong><br>该值可以是一个方法，也可以是一个字符串（spider实例中一个方法的名称）。它就是一个回调方法，它的作用是在此处调用一个指定的方法。<br>但要注意的是：要慎用<code>parse</code>做为回调方法，因为这边的<code>parse</code>已经不像传统spider类中的那样没有具体操作，调用同名的<code>parse</code>可能会造成冲突。</p>
+<p><strong>follow：</strong><br>是一个布尔对象，表示是当前<code>response</code>否继续采集。如果<code>callback</code>是None，那么它就默认为True，否则为False。</p>
+<hr>
+<h4>整个数据的流向如下图所示：</h4>
+
+<p><img src="https://1j0ker.github.io/md_img/CrwalSpider.jpg" alt="exmple1.md"></p>
+<hr>
+<h4>CrawlSpider爬取微信小程序文章</h4>
+
+<p><strong>spider.py:</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="keyword">from</span> scrapy.linkextractors <span class="keyword">import</span> LinkExtractor</span><br><span class="line"><span class="keyword">from</span> scrapy.spiders <span class="keyword">import</span> CrawlSpider, Rule</span><br><span class="line"><span class="keyword">from</span> WXapp.items <span class="keyword">import</span> WxappItem</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WxappSpiderSpider</span><span class="params">(CrawlSpider)</span>:</span></span><br><span class="line">    name = <span class="string">'wxapp_spider'</span></span><br><span class="line">    allowed_domains = [<span class="string">'wxapp-union.com'</span>]</span><br><span class="line">    start_urls = [<span class="string">'http://www.wxapp-union.com/portal.php?mod=list&amp;catid=2&amp;page=1'</span>]</span><br><span class="line"></span><br><span class="line">    rules = (</span><br><span class="line">        Rule(LinkExtractor(allow=<span class="string">r".+mod=list&amp;catid=2&amp;page=\d"</span>), follow=<span class="literal">True</span>),</span><br><span class="line">        Rule(LinkExtractor(allow=<span class="string">r".+article.+\.html"</span>), callback=<span class="string">"parse_item"</span>, follow=<span class="literal">False</span>)</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse_item</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        title = response.xpath(<span class="string">"//h1[@class='ph']/text()"</span>).get()</span><br><span class="line">        author = response.xpath(<span class="string">"//p[@class='authors']//a/text()"</span>).get()</span><br><span class="line">        content_json = response.xpath(<span class="string">"//td[@id='article_content']//text()"</span>).getall()<span class="comment">#很多标签有内容，使用getall()全部获得，list型数据</span></span><br><span class="line">        content = <span class="string">""</span>.join(content_json).strip()<span class="comment">#转成字符串形式</span></span><br><span class="line">        item = WxappItem(title=title, author=author, content=content)</span><br><span class="line">        <span class="keyword">yield</span> item</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>CrawlSpider</code>使用的重点就是<code>rules</code>规则的构造，确保构造出所允许的采集站点；</li>
+<li>item.py中更改相应的<code>WxappItem</code>方法；</li>
+</ul>
+<br>
+
+<br>
+(PS:T-ara十周年快乐啊!)
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/29/Crawl_spider/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-scrapy初学习" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -637,7 +737,7 @@ XSS向来是安全方面所重视的一大难题，虽然近年来在OWASP中下
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$a = $_GET[<span class="string">'a'</span>];</span><br><span class="line"><span class="keyword">echo</span> $a;</span><br></pre></td></tr></table></figure>
 
 <p>毫无过滤，我们可以很轻松的构造一种payload来实现XSS：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a=<span class="xml"><span class="tag">&lt;<span class="name">script</span>&gt;</span>alert(1)<span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br><span class="line">a=<span class="xml"><span class="tag">&lt;<span class="name">img</span>/<span class="attr">src</span>=<span class="string">1/onerror</span>=<span class="string">alert(1)</span>&gt;</span></span></span><br><span class="line">a=&lt;svg/onload=alert(1)&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a=&lt;script&gt;alert(1)&lt;/script&gt;</span><br><span class="line">a=&lt;img/src=1/onerror=alert(1)&gt;</span><br><span class="line">a=&lt;svg/onload=alert(1)&gt;</span><br></pre></td></tr></table></figure>
 
 <p>所以大多数会使用<code>htmlspecialchars</code>函数来过滤输入，或者更严格一些，使用<code>htmlspecialchars</code> + 黑名单的形式：</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&amp; (AND) =&gt; &amp;amp;</span><br><span class="line">" (双引号) =&gt; &amp;quot; (当ENT_NOQUOTES没有设置的时候) </span><br><span class="line">' (单引号) =&gt; &amp;#039; (当ENT_QUOTES设置) </span><br><span class="line"><span class="tag">&lt; (小于号) =&gt;</span> &amp;lt; </span><br><span class="line">&gt; (大于号) =&gt; &amp;gt; </span><br><span class="line">...</span><br><span class="line">on\w+=</span><br><span class="line">script</span><br><span class="line">svg</span><br><span class="line">iframe</span><br><span class="line">link</span><br><span class="line">...</span><br><span class="line">% * + , – / ; <span class="tag">&lt; = &gt;</span> ^ | `</span><br></pre></td></tr></table></figure>
@@ -685,7 +785,7 @@ XSS向来是安全方面所重视的一大难题，虽然近年来在OWASP中下
 
 <p>但是如果可信域内存在一个可控的重定向文件，那么CSP的目录限制就可以被绕过。</p>
 <p>假设static目录下存在一个302文件：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Static/302.php</span><br><span class="line"></span><br><span class="line"><span class="php"><span class="meta">&lt;?php</span> Header(<span class="string">"location: "</span>.$_GET[<span class="string">'url'</span>])<span class="meta">?&gt;</span></span></span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Static/302.php</span><br><span class="line"></span><br><span class="line">&lt;?php Header(&quot;location: &quot;.$_GET[&apos;url&apos;])?&gt;</span><br></pre></td></tr></table></figure>
 
 <p>首先上传一个内容为JS的上传一个test.jpg；<br>然后通过302.php跳转到upload目录加载js就可以成功执行：</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"static/302.php?url=upload/test.js"</span>&gt;</span></span><br></pre></td></tr></table></figure>
@@ -1256,107 +1356,10 @@ b)    联动安装TAM，查看是否已有事件生成，如果有，则是可�
 
 
   
-    <article id="post-py-spiders1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/11/py-spiders1/">Python爬虫闯关练习</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/11/py-spiders1/" class="archive-article-date">
-  	<time datetime="2019-07-11T10:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-11</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="Python爬虫闯关练习"><a href="#Python爬虫闯关练习" class="headerlink" title="Python爬虫闯关练习"></a>Python爬虫闯关练习</h1><p>黑板客爬虫闯关<a href="http://www.heibanke.com/lesson" target="_blank" rel="noopener">http://www.heibanke.com/lesson</a></p>
-<h2 id="第一关"><a href="#第一关" class="headerlink" title="第一关"></a>第一关</h2><h3 id="连续爬取数据并get传参"><a href="#连续爬取数据并get传参" class="headerlink" title="连续爬取数据并get传参"></a>连续爬取数据并get传参</h3><p>&#8195;<em>先试着输入几次参数，了解题目目标</em><br><img src="https://1j0ker.github.io/md_img/py_zj1.png" alt="exmple1.md"></p>
-<p><strong>思路：</strong>每次输入指定数字后会要求新的get参数，所以需要不断的匹配数字然后提交；<br>    利用模块<code>requests  和    re模块</code><br>这里查看网页源码，可以清晰的看到需要匹配的字段特征：<br><img src="https://1j0ker.github.io/md_img/py_zj2.png" alt="exmple2.md"></p>
-<hr>
-<p><strong>py代码：</strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line">url = <span class="string">'http://www.heibanke.com/lesson/crawler_ex00/'</span></span><br><span class="line">r = requests.get(url=url)</span><br><span class="line"></span><br><span class="line">numbers = re.findall(<span class="string">r'&lt;h3&gt;你需要在网址后输入数字([\d]&#123;5&#125;)'</span>,r.text)</span><br><span class="line"><span class="comment">#print(numbers)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> numbers:</span><br><span class="line">    url = <span class="string">'http://www.heibanke.com/lesson/crawler_ex00/%s/'</span> % numbers[<span class="number">0</span>]</span><br><span class="line">    print(url)</span><br><span class="line">    html = requests.get(url=url)</span><br><span class="line">    numbers = re.findall(<span class="string">r'数字是([\d]&#123;5&#125;)'</span>,html.text)<span class="comment">#通过更新数字，来判断循环的终止</span></span><br><span class="line">    <span class="keyword">print</span> (numbers)</span><br><span class="line"><span class="keyword">else</span>:    </span><br><span class="line">    print(html.text)<span class="comment">#最后过关的页面</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="最终密码：0第二关"><a href="#最终密码：0第二关" class="headerlink" title="最终密码：0第二关"></a><strong>最终密码：0</strong><br><br><br>第二关</h2><h3 id="POST型传参"><a href="#POST型传参" class="headerlink" title="POST型传参"></a>POST型传参</h3><p><img src="https://1j0ker.github.io/md_img/py_zj3.png" alt="exmple3.md"><br><em>随便输入尝试一下，发现报错信息：</em></p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>这里是黑板客爬虫闯关的第二关<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h3</span>&gt;</span>您输入的密码错误, 请重新输入<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p><br><br><br><strong>思路：</strong>正常的登录页面，很明显是<strong>POST</strong>传表单,再加上循环取值就行；<br>同样匹配判断是否包含错误信息，来终止循环；<br>使用模块<code>requests  和    re模块</code></p>
-<hr>
-<p><strong>py代码：</strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line">url = <span class="string">'http://www.heibanke.com/lesson/crawler_ex01/'</span></span><br><span class="line">html = requests.post(url=url, data=&#123;<span class="string">'username'</span>:<span class="string">'ads'</span>,<span class="string">'password'</span>:<span class="number">1</span>&#125;)</span><br><span class="line">char = re.findall(<span class="string">'密码错误'</span>,html.text)</span><br><span class="line">print(char)</span><br><span class="line"></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">for psd in range(30):</span></span><br><span class="line"><span class="string">    print (psd)</span></span><br><span class="line"><span class="string">    html = requests.post(url=url, data=&#123;'username':'ads','password':psd&#125;)</span></span><br><span class="line"><span class="string">    if '密码错误' not in html.text:</span></span><br><span class="line"><span class="string">        print('password =',psd)</span></span><br><span class="line"><span class="string">        break</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#2.while使用</span></span><br><span class="line">psd = <span class="number">-2</span></span><br><span class="line"><span class="keyword">while</span> char <span class="keyword">and</span> psd &lt; <span class="number">30</span>:</span><br><span class="line">    <span class="keyword">print</span> (psd)</span><br><span class="line">    html = requests.post(url=url, data=&#123;<span class="string">'username'</span>:<span class="string">'ads'</span>,<span class="string">'password'</span>:psd&#125;)</span><br><span class="line">    char = re.findall(<span class="string">'密码错误'</span>,html.text)</span><br><span class="line">    psd +=<span class="number">1</span></span><br><span class="line"><span class="keyword">print</span> (<span class="string">'password ='</span>,psd<span class="number">-1</span>)</span><br></pre></td></tr></table></figure>
-
-<p><strong>最终密码：4</strong></p>
-<hr>
-<p><br><br></p>
-<h2 id="第三关"><a href="#第三关" class="headerlink" title="第三关"></a>第三关</h2><h3 id="验证登录以及从爬虫保持Token访问"><a href="#验证登录以及从爬虫保持Token访问" class="headerlink" title="验证登录以及从爬虫保持Token访问"></a>验证登录以及从爬虫保持Token访问</h3><p><em>进入第三关的链接<a href="http://www.heibanke.com/lesson/crawler_ex02/" target="_blank" rel="noopener">http://www.heibanke.com/lesson/crawler_ex02/</a><br>但是跳转到了<code>login</code>登陆页面,一开始以为在线的题目出错了，但注册完在登陆进去之后，才明白题目确实是这样的要求：</em><br><img src="https://1j0ker.github.io/md_img/py_zj4.png" alt="exmple4.md"><br>注册登录后，发现题目：<br><img src="https://1j0ker.github.io/md_img/py_zj5.png" alt="exmple5.md"><br><br><br>和第二关很像，用第二关的代码改了下<code>url</code>在运行，出现了问题：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"summary"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">h1</span>&gt;</span>Forbidden <span class="tag">&lt;<span class="name">span</span>&gt;</span>(403)<span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">p</span>&gt;</span>CSRF verification failed. Request aborted.<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>发现了访问拒绝，又是<strong>POST</strong>包，这时候要去看一看<strong>request</strong>里面post哪些东西？<br><img src="https://1j0ker.github.io/md_img/py_zj6.png" alt="exmple6.md"><br>很明显多了个<code>token值</code>，再仔细查看，是<strong>request</strong>里cookies的这个值<code>csrftoken=2m7tnWxAV9Bm9lfFjWQ3vvCxAvY3qSxe;</code><br><br><br>那现在问题是这个token值是怎么获得的？经过一番F12是访问题目页面时，<strong>respond</strong>里的<code>Set-Cookie: csrftoken=2m7tnWxAV9Bm9lfFjWQ3vvCxAvY3qSxe;</code>由服务器发送给我们，用来验证接下来我们操作的身份；<br><br><br>也就是说，我们要在<strong>POST</strong>数据时，首先爬取<code>csrftoken</code>值，然后将<code>token</code>一同传过去；</p>
-<hr>
-<p>py代码(这次就没用<code>re</code>模块了)：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">url_1 = <span class="string">'http://www.heibanke.com/accounts/login'</span></span><br><span class="line">url_2 = <span class="string">'http://www.heibanke.com/lesson/crawler_ex02/'</span></span><br><span class="line">s = requests.Session()  <span class="comment">#创建会话，保存token</span></span><br><span class="line"></span><br><span class="line">s.get(url_1)</span><br><span class="line">token_1 = s.cookies[<span class="string">'csrftoken'</span>]<span class="comment">#get登录，拿到当前token</span></span><br><span class="line">print(token_1)</span><br><span class="line">data_1 = &#123;</span><br><span class="line">    <span class="string">'username'</span>: <span class="string">'efre'</span>,<span class="comment">#注册过的账号</span></span><br><span class="line">    <span class="string">'password'</span>: <span class="string">'123456123456'</span>,</span><br><span class="line">    <span class="string">'csrfmiddlewaretoken'</span>: token_1,</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">s.post(url_1,data=data_1)<span class="comment">#登录</span></span><br><span class="line"><span class="comment">#print(r.text)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">data_2 = &#123;</span><br><span class="line">    <span class="string">'username'</span>:<span class="string">'admin'</span>,</span><br><span class="line">    <span class="string">'password'</span>:<span class="number">0</span>,</span><br><span class="line">    <span class="string">'csrfmiddlewaretoken'</span>:<span class="string">''</span>,</span><br><span class="line">    &#125;</span><br><span class="line">s.post(url_2)<span class="comment">#获取题目页面的初始token值</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> pwd <span class="keyword">in</span> range(<span class="number">31</span>):</span><br><span class="line">    token_2 = s.cookies[<span class="string">'csrftoken'</span>]</span><br><span class="line">    data_2[<span class="string">'csrfmiddlewaretoken'</span>]=token_2</span><br><span class="line">    data_2[<span class="string">'password'</span>]=pwd</span><br><span class="line">    print(pwd,<span class="string">'+'</span>,token_2)<span class="comment">#查看当前密码和当前token值</span></span><br><span class="line">    html = s.post(url_2, data=data_2)</span><br><span class="line">    <span class="comment">#print(html.text)</span></span><br><span class="line">    <span class="keyword">if</span> <span class="string">'密码错误'</span> <span class="keyword">not</span> <span class="keyword">in</span> html.text:</span><br><span class="line">        <span class="comment">#print(html.text)</span></span><br><span class="line">        print(<span class="string">'password ='</span>,pwd)</span><br><span class="line">        <span class="keyword">break</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>最终密码：21</strong></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/11/py-spiders1/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
+    <nav id="page-nav">
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+    </nav>
   
 
 

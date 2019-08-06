@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2019/07/29/Crawl_spider/</loc>
+    
+    <lastmod>2019-08-06T13:58:56.274Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2019/08/05/CVE-2019-14234/</loc>
     
     <lastmod>2019-08-06T13:40:21.168Z</lastmod>
