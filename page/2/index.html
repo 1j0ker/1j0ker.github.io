@@ -152,6 +152,102 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-UTS安装时问题总结" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/12/UTS安装时问题总结/">UTS安装时问题总结</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/12/UTS安装时问题总结/" class="archive-article-date">
+  	<time datetime="2019-07-12T12:39:30.332Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-12</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在学习UTS安装时，会遇到各种各样的问题，安装完成后，对各种出现的问题需要自我总结。</p>
+<h2 id="出现的问题及解决方案"><a href="#出现的问题及解决方案" class="headerlink" title="出现的问题及解决方案"></a>出现的问题及解决方案</h2><h3 id="一、DELL-R730-服务器"><a href="#一、DELL-R730-服务器" class="headerlink" title="一、DELL R730 服务器"></a>一、DELL R730 服务器</h3><h4 id="1-U盘安装centos-7-3："><a href="#1-U盘安装centos-7-3：" class="headerlink" title="1.    U盘安装centos 7.3："></a>1.    U盘安装centos 7.3：</h4><p>a)    DELL R730 F11进入BIOS，设置UEFI后，重启后再次进入F11，BIOS中选择从USB启动，开始安装Centos 7;</p>
+<p>b)    Centos 安装界面时，按e进入编辑，修改成正确的U盘名称：sd*，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd /dev			#第一次无法查看，失败一次后，命令行查看自己的U盘名称</span><br></pre></td></tr></table></figure>
+
+<p>安装路径改为 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">… … =hd: /dev/sd* quiet</span><br></pre></td></tr></table></figure>
+
+<p>c)    Centos 安装过程中，手动分区问题：</p>
+<pre><code>①确认正确的 File system 后，记得Update;
+
+②**/home**分区问题：有几块盘，就分几个**/home/sd*** 子目录，最后加上/home目录;</code></pre><p>d)    Centos安装完成后：强制常见User用户，建议系统启动后锁个屏，然后更换为/root用户登录；（防止UTS文件解压后，放入/home下，却发现实际在/home/User下，造成安装脚本的运行失败；</p>
+<h4 id="2-UTS-脚本配置："><a href="#2-UTS-脚本配置：" class="headerlink" title="2.    UTS 脚本配置："></a>2.    UTS 脚本配置：</h4><p>a)    UTS参数配置时，注意绑定的网卡(如<strong>em3</strong>)，后面选择透传网卡时不会再出现在选择列表；</p>
+<p>b)    在运行UTS安装脚本前，建议最大化终端，否则可能会出现分辨率显示不全问题；（在选择透传网卡）;</p>
+<p>c)    脚本安装完成后，提示<strong>reboot</strong>，再确认无error：后再重启；（syn…error脚本中语法错误可忽略）;</p>
+<p>d)    重启后：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">virsh list –all				#先确定uts_01是否runing</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">virsh console uts_01		#在开始控制UTS虚拟机</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="二、重点注意问题"><a href="#二、重点注意问题" class="headerlink" title="二、重点注意问题"></a>二、重点注意问题</h3><ol>
+<li>在执行UTS参数确定网卡安装脚本后，网卡与网桥绑定，不易卸载网桥；<br>（可进入/<strong>etc/sysconfig/network_config/vibr0</strong>处修改网桥ip）</li>
+</ol>
+<p>2    . 重装虚拟机：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a)	virsh shutdown uts_01		#关闭当前虚拟机uts_01</span><br><span class="line">	virsh undefine uts_01		#卸载现有虚拟机uts_01</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">b)	rm –r 现在虚拟机生成的.img		#删除uts_01生成的镜像文件；</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c)	重新执行安装脚本；</span><br></pre></td></tr></table></figure>
+
+<p>3    . 注意参数配置的，分配内存的大小，太大时，在UTS的web端进行系统或规则包升级时，容易造成卡死。重启UTS虚拟机；</p>
+<p>4    . 安装完成UTS后，web端访问无流量显示：</p>
+<pre><code>a)    查看接口信息，是否接口网桥未开启；
+b)    联动安装TAM，查看是否已有事件生成，如果有，则是可能是接口显示问题，建议联系开发查看；</code></pre>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/12/UTS安装时问题总结/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-py-spiders1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
