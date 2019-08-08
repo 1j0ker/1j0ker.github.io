@@ -6,15 +6,22 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2019/8 | Hexo</title>
+  <title>Scrapy下载器中间件 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/archives/2019/08/index.html">
+  <meta name="description" content="Scrapy下载器中间件  请求request在发送给下载器之前和下载器返回响应response的时候,要经过Downloader Middleware,以此可以在此时对request和response做处理; 中间件使用到的三大方法：  process_request(request,spider) process_response(request, response, spider) proc">
+<meta name="keywords" content="To be continued...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scrapy下载器中间件">
+<meta property="og:url" content="http://yoursite.com/2019/08/08/scrapy下载器中间件/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Scrapy下载器中间件  请求request在发送给下载器之前和下载器返回响应response的时候,要经过Downloader Middleware,以此可以在此时对request和response做处理; 中间件使用到的三大方法：  process_request(request,spider) process_response(request, response, spider) proc">
 <meta property="og:locale" content="default">
+<meta property="og:image" content="https://1j0ker.github.io/md_img/scrapy_middle.jpg">
+<meta property="og:updated_time" content="2019-08-08T14:28:47.372Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo">
+<meta name="twitter:title" content="Scrapy下载器中间件">
+<meta name="twitter:description" content="Scrapy下载器中间件  请求request在发送给下载器之前和下载器返回响应response的时候,要经过Downloader Middleware,以此可以在此时对request和response做处理; 中间件使用到的三大方法：  process_request(request,spider) process_response(request, response, spider) proc">
+<meta name="twitter:image" content="https://1j0ker.github.io/md_img/scrapy_middle.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -150,36 +157,114 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
+            <article id="post-scrapy下载器中间件" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
+    <h1 class="article-title" itemprop="name">
+      Scrapy下载器中间件
+    </h1>
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/08/08/scrapy下载器中间件/" class="archive-article-date">
+
+        
+        <a href="/2019/08/08/scrapy下载器中间件/" class="archive-article-date">
   	<time datetime="2019-08-08T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-08</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/08/08/scrapy下载器中间件/">Scrapy下载器中间件</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2>Scrapy下载器中间件</h2>
 
-        <div class="article-info info-on-right">
-          
+<p>请求request在发送给下载器之前和下载器返回响应response的时候,要经过<code>Downloader Middleware</code>,以此可以在此时对request和response做处理;</p>
+<p>中间件使用到的三大方法：</p>
+<ul>
+<li>process_request(request,spider)</li>
+<li>process_response(request, response, spider)</li>
+<li>process_exception(request, exception, spider)</li>
+</ul>
+<h4>process_request(request,spider):</h4>
+
+<p>当每个request通过下载中间件时，该方法被调用，这里有一个要求，该方法必须返回以下三种中的任意一种：</p>
+<ol>
+<li>None;</li>
+<li>返回一个Response对象;</li>
+<li>返回一个Request对象或raise IgnoreRequest;</li>
+</ol>
+<p>三种返回值的作用是不同的。</p>
+<p><strong>None:</strong>Scrapy将继续处理该request，执行其他的中间件的相应方法，直到合适的下载器处理函数(download handler)被调用,该request被执行(其response被下载)。</p>
+<p><strong>Response对象：</strong>Scrapy将不会调用任何其他的<code>process_request()</code>或<code>process_exception()</code> 方法，或相应地下载函数；其将返回该response。 已安装的中间件的 <code>process_response()</code> 方法则会在每个response返回时被调用。</p>
+<p><strong>Request对象：</strong>Scrapy则停止调用 <code>process_request()</code>方法并重新调度返回的request。当新返回的request被执行后， 相应地中间件链将会根据下载的response被调用。</p>
+<p><strong>raise一个IgnoreRequest异常：</strong>则安装的下载中间件的 <code>process_exception()</code> 方法会被调用。如果没有任何一个方法处理该异常， 则request的<code>errback(Request.errback)</code>方法会被调用。如果没有代码处理抛出的异常， 则该异常被忽略且不记录。</p>
+<h4>process_response(request, response, spider):</h4>
+
+<p>当每个response通过下载中间件时，该方法被调用。process_response的返回值也是有三种：response对象，request对象，或者raise一个IgnoreRequest异常</p>
+<p><strong>Response对象：</strong>如果其返回一个Response(可以与传入的response相同，也可以是全新的对象)， 该response会被在链中的其他中间件的 <code>process_response()</code> 方法处理。</p>
+<p><strong>Request对象：</strong>如果其返回一个 Request 对象，则中间件链停止， 返回的request会被重新调度下载。处理类似于 <code>process_request()</code> 返回request所做的那样。</p>
+<p><strong>IgnoreRequest异常:</strong>如果其抛出一个 IgnoreRequest 异常，则调用request的<code>errback(Request.errback)</code>。 如果没有代码处理抛出的异常，则该异常被忽略且不记录(不同于其他异常那样)。</p>
+<h4>process_exception(request, exception, spider):</h4>
+
+<p>当下载处理器(download handler)或 <code>process_request()</code> (下载中间件)抛出异常(包括 IgnoreRequest 异常)时，Scrapy调用 <code>process_exception()</code>。</p>
+<p><code>process_exception()</code> 也是返回三者中的一个: 返回 None 、 一个 Response 对象、或者一个 Request 对象。</p>
+<p><strong>None:</strong>如果其返回 None ，Scrapy将会继续处理该异常，接着调用已安装的其他中间件的 <code>process_exception()</code> 方法，直到所有中间件都被调用完毕，则调用默认的异常处理。</p>
+<p><strong>Response对象：</strong>如果其返回一个 Response 对象，则已安装的中间件链的 <code>process_response()</code> 方法被调用。Scrapy将不会调用任何其他中间件的 <code>process_exception()</code> 方法。</p>
+<p><strong>Request对象：</strong>如果其返回一个 Request 对象， 则返回的request将会被重新调用下载。这将停止中间件<code>process_exception()</code> 方法执行，就如返回一个response的那样。 这个是非常有用的，就相当于如果我们失败了可以在这里进行一次失败的重试，例如当我们访问一个网站出现因为频繁爬取被封ip就可以在这里设置增加代理继续访问。</p>
+<h3>流程如图所示：</h3>
+
+<p><img src="https://1j0ker.github.io/md_img/scrapy_middle.jpg" alt="exmple1.md"></p>
+<p>总的来说下载器中间件就是起到处理request请求并且返回response的作用，一切从网页爬取的url发起的请求会组成一个请求队列，然后一个一个排队经过下载器中间件，之后下载器中间件会对request做出相应的处理。</p>
+<p>比如添加请求头，添加代理等等，然后通过<code>process_response()</code>返回一个response，之后就是用得到的response做出相应的分析，当然这里的内容页可以不实现，但是如果要爬取大型的网站，会遇到被ban的可能就要在下载器中间件这里着手，设置一些相应的请求头，ip代理等等内容。</p>
+<h3>使用中间件添加随机头</h3>
+
+<p>测试网站： <a href="http://httpbin.org/user-agent" title="http://httpbin.org/user-agent" target="_blank" rel="noopener">http://httpbin.org/user-agent</a></p>
+<p>它能直接打印出你当前访问所使用的请求头；</p>
+<p>请求头大全站点： <a href="http://useragentstring.com/pages/useragentstring.php?typ=Browser" title="http://useragentstring.com" target="_blank" rel="noopener">http://useragentstring.com/pages/useragentstring.php?typ=Browser</a></p>
+<p>包含当前最全最新的请求头；</p>
+<br>
+
+<p><strong>spider的代码：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">httpbinSpider</span><span class="params">(scrapy.Spider)</span>:</span></span><br><span class="line">    name = <span class="string">'httpbin'</span></span><br><span class="line">    allowed_domains = [<span class="string">'httpbin.org'</span>]</span><br><span class="line">    start_urls = <span class="string">'http://httpbin.org/user-agent'</span></span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        print(response.text)</span><br><span class="line">		<span class="keyword">yield</span> scrapy.Request(url=self.start_urls[<span class="number">0</span>],dont_filter=<span class="literal">True</span>)</span><br><span class="line">		<span class="comment">#多次请求同一url，记得把dont_filter设置成true，防止scrapy自身去重；</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>setting.py代码添加：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">USER_AGENTS = [</span><br><span class="line">            <span class="string">"Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Win64; x64; Trident/5.0; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 2.0.50727; Media Center PC 6.0)"</span>,</span><br><span class="line">            <span class="string">"Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)"</span>,</span><br><span class="line">            <span class="string">"Mozilla/4.0 (compatible; MSIE 7.0b; Windows NT 5.2; .NET CLR 1.1.4322; .NET CLR 2.0.50727; InfoPath.2; .NET CLR 3.0.04506.30)"</span>,</span><br><span class="line">            <span class="string">"Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN) AppleWebKit/523.15 (KHTML, like Gecko, Safari/419.3) Arora/0.3 (Change: 287 c9dfb30)"</span>,</span><br><span class="line">            <span class="string">"Mozilla/5.0 (X11; U; Linux; en-US) AppleWebKit/527+ (KHTML, like Gecko, Safari/419.3) Arora/0.6"</span>,</span><br><span class="line">            <span class="string">"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.2pre) Gecko/20070215 K-Ninja/2.1.1"</span>,</span><br><span class="line">            <span class="string">"Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9) Gecko/20080705 Firefox/3.0 Kapiko/3.0"</span>,</span><br><span class="line">            <span class="string">"Mozilla/5.0 (X11; Linux i686; U;) Gecko/20070322 Kazehakase/0.4.5"</span>,</span><br><span class="line">            <span class="string">"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3192.0 Safari/537.36Name"</span></span><br><span class="line">            ]</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">DOWNLOADER_MIDDLEWARES = &#123;</span><br><span class="line">   <span class="string">'httpbin.middlewares.UserAgentMiddleware'</span>: <span class="number">543</span>,<span class="comment">#这里使用middlewares里的随机头</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>middlewares.py代码添加：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">from</span> httpbin.settings <span class="keyword">import</span> USER_AGENTS <span class="keyword">as</span> ua_list</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserAgentMiddleware</span><span class="params">(object)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#给每个请求随机选取user_Agent</span></span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_request</span><span class="params">(self,request, spider)</span>:</span></span><br><span class="line">        user_agent = random.choice(ua_list)<span class="comment">#从setting里的请求头表里随机选一个</span></span><br><span class="line">        request.headers[<span class="string">'USER_AGENTS'</span>] = user_agent</span><br><span class="line">        <span class="comment"># request.meta['proxy']  设置代理</span></span><br><span class="line">		print(<span class="string">'='</span>*<span class="number">30</span>)</span><br><span class="line">        print(<span class="string">'request: '</span>, request.headers[<span class="string">'USER_AGENTS'</span>] )</span><br><span class="line">        print(<span class="string">'='</span>*<span class="number">30</span>)</span><br></pre></td></tr></table></figure>
+
+<p>ＯＫ！</p>
+<p>To be continue…</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -191,133 +276,106 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/08/08/scrapy下载器中间件/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/08/07/python去重删除/" class="archive-article-date">
-  	<time datetime="2019-08-07T15:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-07</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2019/08/07/python去重删除/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Python实用工具系列</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/08/07/python去重删除/">Python实用工具系列</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/08/05/CVE-2019-14234/" class="archive-article-date">
-  	<time datetime="2019-08-05T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-05</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/08/05/CVE-2019-14234/">【转】Django JSONField SQL注入漏洞（CVE-2019-14234）</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/08/03/scrapy验证码登录/" class="archive-article-date">
-  	<time datetime="2019-08-03T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-03</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/08/03/scrapy验证码登录/">scrpy的登录验证码</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-  
-    </div></section>
-  
-
-    
 
 
           </div>
@@ -340,8 +398,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,

@@ -152,6 +152,138 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-scrapy下载器中间件" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/08/08/scrapy下载器中间件/">Scrapy下载器中间件</a>
+    </h1>
+  
+
+        
+        <a href="/2019/08/08/scrapy下载器中间件/" class="archive-article-date">
+  	<time datetime="2019-08-08T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-08</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2>Scrapy下载器中间件</h2>
+
+<p>请求request在发送给下载器之前和下载器返回响应response的时候,要经过<code>Downloader Middleware</code>,以此可以在此时对request和response做处理;</p>
+<p>中间件使用到的三大方法：</p>
+<ul>
+<li>process_request(request,spider)</li>
+<li>process_response(request, response, spider)</li>
+<li>process_exception(request, exception, spider)</li>
+</ul>
+<h4>process_request(request,spider):</h4>
+
+<p>当每个request通过下载中间件时，该方法被调用，这里有一个要求，该方法必须返回以下三种中的任意一种：</p>
+<ol>
+<li>None;</li>
+<li>返回一个Response对象;</li>
+<li>返回一个Request对象或raise IgnoreRequest;</li>
+</ol>
+<p>三种返回值的作用是不同的。</p>
+<p><strong>None:</strong>Scrapy将继续处理该request，执行其他的中间件的相应方法，直到合适的下载器处理函数(download handler)被调用,该request被执行(其response被下载)。</p>
+<p><strong>Response对象：</strong>Scrapy将不会调用任何其他的<code>process_request()</code>或<code>process_exception()</code> 方法，或相应地下载函数；其将返回该response。 已安装的中间件的 <code>process_response()</code> 方法则会在每个response返回时被调用。</p>
+<p><strong>Request对象：</strong>Scrapy则停止调用 <code>process_request()</code>方法并重新调度返回的request。当新返回的request被执行后， 相应地中间件链将会根据下载的response被调用。</p>
+<p><strong>raise一个IgnoreRequest异常：</strong>则安装的下载中间件的 <code>process_exception()</code> 方法会被调用。如果没有任何一个方法处理该异常， 则request的<code>errback(Request.errback)</code>方法会被调用。如果没有代码处理抛出的异常， 则该异常被忽略且不记录。</p>
+<h4>process_response(request, response, spider):</h4>
+
+<p>当每个response通过下载中间件时，该方法被调用。process_response的返回值也是有三种：response对象，request对象，或者raise一个IgnoreRequest异常</p>
+<p><strong>Response对象：</strong>如果其返回一个Response(可以与传入的response相同，也可以是全新的对象)， 该response会被在链中的其他中间件的 <code>process_response()</code> 方法处理。</p>
+<p><strong>Request对象：</strong>如果其返回一个 Request 对象，则中间件链停止， 返回的request会被重新调度下载。处理类似于 <code>process_request()</code> 返回request所做的那样。</p>
+<p><strong>IgnoreRequest异常:</strong>如果其抛出一个 IgnoreRequest 异常，则调用request的<code>errback(Request.errback)</code>。 如果没有代码处理抛出的异常，则该异常被忽略且不记录(不同于其他异常那样)。</p>
+<h4>process_exception(request, exception, spider):</h4>
+
+<p>当下载处理器(download handler)或 <code>process_request()</code> (下载中间件)抛出异常(包括 IgnoreRequest 异常)时，Scrapy调用 <code>process_exception()</code>。</p>
+<p><code>process_exception()</code> 也是返回三者中的一个: 返回 None 、 一个 Response 对象、或者一个 Request 对象。</p>
+<p><strong>None:</strong>如果其返回 None ，Scrapy将会继续处理该异常，接着调用已安装的其他中间件的 <code>process_exception()</code> 方法，直到所有中间件都被调用完毕，则调用默认的异常处理。</p>
+<p><strong>Response对象：</strong>如果其返回一个 Response 对象，则已安装的中间件链的 <code>process_response()</code> 方法被调用。Scrapy将不会调用任何其他中间件的 <code>process_exception()</code> 方法。</p>
+<p><strong>Request对象：</strong>如果其返回一个 Request 对象， 则返回的request将会被重新调用下载。这将停止中间件<code>process_exception()</code> 方法执行，就如返回一个response的那样。 这个是非常有用的，就相当于如果我们失败了可以在这里进行一次失败的重试，例如当我们访问一个网站出现因为频繁爬取被封ip就可以在这里设置增加代理继续访问。</p>
+<h3>流程如图所示：</h3>
+
+<p><img src="https://1j0ker.github.io/md_img/scrapy_middle.jpg" alt="exmple1.md"></p>
+<p>总的来说下载器中间件就是起到处理request请求并且返回response的作用，一切从网页爬取的url发起的请求会组成一个请求队列，然后一个一个排队经过下载器中间件，之后下载器中间件会对request做出相应的处理。</p>
+<p>比如添加请求头，添加代理等等，然后通过<code>process_response()</code>返回一个response，之后就是用得到的response做出相应的分析，当然这里的内容页可以不实现，但是如果要爬取大型的网站，会遇到被ban的可能就要在下载器中间件这里着手，设置一些相应的请求头，ip代理等等内容。</p>
+<h3>使用中间件添加随机头</h3>
+
+<p>测试网站： <a href="http://httpbin.org/user-agent" title="http://httpbin.org/user-agent" target="_blank" rel="noopener">http://httpbin.org/user-agent</a></p>
+<p>它能直接打印出你当前访问所使用的请求头；</p>
+<p>请求头大全站点： <a href="http://useragentstring.com/pages/useragentstring.php?typ=Browser" title="http://useragentstring.com" target="_blank" rel="noopener">http://useragentstring.com/pages/useragentstring.php?typ=Browser</a></p>
+<p>包含当前最全最新的请求头；</p>
+<br>
+
+<p><strong>spider的代码：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">httpbinSpider</span><span class="params">(scrapy.Spider)</span>:</span></span><br><span class="line">    name = <span class="string">'httpbin'</span></span><br><span class="line">    allowed_domains = [<span class="string">'httpbin.org'</span>]</span><br><span class="line">    start_urls = <span class="string">'http://httpbin.org/user-agent'</span></span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        print(response.text)</span><br><span class="line">		<span class="keyword">yield</span> scrapy.Request(url=self.start_urls[<span class="number">0</span>],dont_filter=<span class="literal">True</span>)</span><br><span class="line">		<span class="comment">#多次请求同一url，记得把dont_filter设置成true，防止scrapy自身去重；</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>setting.py代码添加：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">USER_AGENTS = [</span><br><span class="line">            <span class="string">"Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Win64; x64; Trident/5.0; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 2.0.50727; Media Center PC 6.0)"</span>,</span><br><span class="line">            <span class="string">"Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)"</span>,</span><br><span class="line">            <span class="string">"Mozilla/4.0 (compatible; MSIE 7.0b; Windows NT 5.2; .NET CLR 1.1.4322; .NET CLR 2.0.50727; InfoPath.2; .NET CLR 3.0.04506.30)"</span>,</span><br><span class="line">            <span class="string">"Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN) AppleWebKit/523.15 (KHTML, like Gecko, Safari/419.3) Arora/0.3 (Change: 287 c9dfb30)"</span>,</span><br><span class="line">            <span class="string">"Mozilla/5.0 (X11; U; Linux; en-US) AppleWebKit/527+ (KHTML, like Gecko, Safari/419.3) Arora/0.6"</span>,</span><br><span class="line">            <span class="string">"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.2pre) Gecko/20070215 K-Ninja/2.1.1"</span>,</span><br><span class="line">            <span class="string">"Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9) Gecko/20080705 Firefox/3.0 Kapiko/3.0"</span>,</span><br><span class="line">            <span class="string">"Mozilla/5.0 (X11; Linux i686; U;) Gecko/20070322 Kazehakase/0.4.5"</span>,</span><br><span class="line">            <span class="string">"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3192.0 Safari/537.36Name"</span></span><br><span class="line">            ]</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">DOWNLOADER_MIDDLEWARES = &#123;</span><br><span class="line">   <span class="string">'httpbin.middlewares.UserAgentMiddleware'</span>: <span class="number">543</span>,<span class="comment">#这里使用middlewares里的随机头</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>middlewares.py代码添加：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">from</span> httpbin.settings <span class="keyword">import</span> USER_AGENTS <span class="keyword">as</span> ua_list</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserAgentMiddleware</span><span class="params">(object)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#给每个请求随机选取user_Agent</span></span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_request</span><span class="params">(self,request, spider)</span>:</span></span><br><span class="line">        user_agent = random.choice(ua_list)<span class="comment">#从setting里的请求头表里随机选一个</span></span><br><span class="line">        request.headers[<span class="string">'USER_AGENTS'</span>] = user_agent</span><br><span class="line">        <span class="comment"># request.meta['proxy']  设置代理</span></span><br><span class="line">		print(<span class="string">'='</span>*<span class="number">30</span>)</span><br><span class="line">        print(<span class="string">'request: '</span>, request.headers[<span class="string">'USER_AGENTS'</span>] )</span><br><span class="line">        print(<span class="string">'='</span>*<span class="number">30</span>)</span><br></pre></td></tr></table></figure>
+
+<p>ＯＫ！</p>
+<p>To be continue…</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/08/08/scrapy下载器中间件/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-python去重删除" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1194,99 +1326,6 @@ CSP虽然有着严格的白名单控制，但仍然只能减轻以偷取信息�
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/07/17/XFFsearch_real_ip/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-py_threading" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/15/py_threading/">Python多线程的变量影响</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/15/py_threading/" class="archive-article-date">
-  	<time datetime="2019-07-15T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-15</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="Python多线程的变量影响"><a href="#Python多线程的变量影响" class="headerlink" title="Python多线程的变量影响"></a>Python多线程的变量影响</h1><h3 id="example1：sleep-控制多线程的变量"><a href="#example1：sleep-控制多线程的变量" class="headerlink" title="example1：sleep()控制多线程的变量"></a>example1：sleep()控制多线程的变量</h3><hr>
-<p><strong>py代码：</strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">num = <span class="number">100</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_1</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> num</span><br><span class="line">    print(<span class="string">"work_1 ---- %d\n"</span> % num)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_2</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        num += <span class="number">1</span></span><br><span class="line">        print(<span class="string">"work_2 ---- %d\n"</span> % num)</span><br><span class="line">        time.sleep(<span class="number">1</span>)<span class="comment">#sleep()控制了work_2线程顺序</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    print(<span class="string">"num最初：%d\n"</span> %num)</span><br><span class="line">    t_1 = threading.Thread(target=work_1)</span><br><span class="line">    t_2 = threading.Thread(target=work_2)</span><br><span class="line">    t_2.start()</span><br><span class="line">    time.sleep(<span class="number">0.5</span>)<span class="comment">#sleep()控制了线程顺序</span></span><br><span class="line">    t_1.start()<span class="comment">#线程只能start一次</span></span><br><span class="line">    time.sleep(<span class="number">3</span>)</span><br><span class="line">    print(<span class="string">"num最后：%d\n"</span> %num)</span><br></pre></td></tr></table></figure>
-
-<p>通过运行结果，发现<code>work_2()</code>中的sleep(1)使得work_2的线程未执行完函数，num便被<code>work_1()</code>调用，所以work_1的num不是103；<br><br><br><img src="https://1j0ker.github.io/md_img/threading_1.jpg" alt="exmple1.md"><br><br></p>
-<h3 id="example2：多线程各自非顺序计算对全局变量的影响"><a href="#example2：多线程各自非顺序计算对全局变量的影响" class="headerlink" title="example2：多线程各自非顺序计算对全局变量的影响"></a>example2：多线程各自非顺序计算对全局变量的影响</h3><p><br>—————————————————————————-<br><strong>py代码：</strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">g_num = <span class="number">0</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_threading</span><span class="params">(num)</span>:</span></span><br><span class="line">    <span class="keyword">global</span> g_num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num):</span><br><span class="line">        g_num += <span class="number">1</span></span><br><span class="line">     </span><br><span class="line">    print(<span class="string">"work_threading ---- %d\n"</span> % g_num)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work</span><span class="params">(num)</span>:</span></span><br><span class="line">    <span class="keyword">global</span> g_num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num):</span><br><span class="line">        g_num += <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">    print(<span class="string">"work ---- %d\n"</span> % g_num)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">	print(<span class="string">"创建多线程之前g_num: %d"</span>%g_num)</span><br><span class="line"></span><br><span class="line">	t = threading.Thread(target=work_threading, args=(<span class="number">100000</span>,))</span><br><span class="line">	t.start()</span><br><span class="line">	<span class="comment">#time.sleep(1)</span></span><br><span class="line">	work(<span class="number">100000</span>)</span><br></pre></td></tr></table></figure>
-
-<p><em>看一下执行结果：</em></p>
-<p><img src="https://1j0ker.github.io/md_img/threading_val2.jpg" alt="exmple2.md"><br><br><br>&#8195;&#8195;能看到，每次执行结果都可能都不相同，原因就是，<code>work_threading()</code>线程调用时使其独自计算，代码继续下读，到<code>work()</code>导致在未完成完整的函数计算时，被双方调用的g_num可能是非最终结果（正常计算应该是100000），造成了最后参数的混乱不一；<br><em>（<code>work()</code>也可以是多线程函数，这里用普通循环函数，便于对比和理解）</em><br><br><br>可以在<code>work_threading()</code>和<code>work()</code>中添加<code>sleep()</code>,确保函数调用的按序进行，也就是example1中的<code>sleep()</code>影响全局变量原因；<br><br><br><img src="https://1j0ker.github.io/md_img/threading_val3.jpg" alt="exmple3.md"></p>
-<br>
---------------
-
-<h3 id="test-1-多线程探测主机"><a href="#test-1-多线程探测主机" class="headerlink" title="test_1:多线程探测主机"></a>test_1:多线程探测主机</h3><p><em>测试一下我所在的ip段</em></p>
-<p><strong>py代码：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">#-*- coding:utf-8 -*-</span><br><span class="line"></span><br><span class="line">import threading</span><br><span class="line">import time</span><br><span class="line">import os		#调用os模块，启动cmd</span><br><span class="line"></span><br><span class="line">code = os.popen(&apos;chcp 65001&apos;)#cmd的GBK编码问题，转成utf-8</span><br><span class="line"></span><br><span class="line">def Check_ip(ip):</span><br><span class="line">    cmd_ip = &apos;ping -n 1 xxx.xxx.xxx.&apos; + str(ip)	# -n 1仅仅探测一个回包，速度更快</span><br><span class="line">    #print(cmd_ip)</span><br><span class="line">    check = os.popen(cmd_ip)</span><br><span class="line">    data = check.read()</span><br><span class="line">    #print(data)</span><br><span class="line">    if &apos;TTL&apos; in data:</span><br><span class="line">        print(&apos;%s is UP\n&apos; % cmd_ip)</span><br><span class="line">    time.sleep(0.5)</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    for i in range(1,255):</span><br><span class="line">        t = threading.Thread(target=Check_ip, args=(i, ))</span><br><span class="line">        t.start()</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
-
-<p>&#8195;&#8195;结果能感觉到，速度明显的加快，打印下进程：</p>
-<p><img src="https://1j0ker.github.io/md_img/threading_checkip1.jpg" alt="exmple4.md"></p>
-<p>###To be continued…</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/15/py_threading/">展开全文 >></a>
         </p>
       
 

@@ -152,6 +152,99 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-py_threading" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/15/py_threading/">Python多线程的变量影响</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/15/py_threading/" class="archive-article-date">
+  	<time datetime="2019-07-15T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Python多线程的变量影响"><a href="#Python多线程的变量影响" class="headerlink" title="Python多线程的变量影响"></a>Python多线程的变量影响</h1><h3 id="example1：sleep-控制多线程的变量"><a href="#example1：sleep-控制多线程的变量" class="headerlink" title="example1：sleep()控制多线程的变量"></a>example1：sleep()控制多线程的变量</h3><hr>
+<p><strong>py代码：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">num = <span class="number">100</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_1</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> num</span><br><span class="line">    print(<span class="string">"work_1 ---- %d\n"</span> % num)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_2</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        num += <span class="number">1</span></span><br><span class="line">        print(<span class="string">"work_2 ---- %d\n"</span> % num)</span><br><span class="line">        time.sleep(<span class="number">1</span>)<span class="comment">#sleep()控制了work_2线程顺序</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    print(<span class="string">"num最初：%d\n"</span> %num)</span><br><span class="line">    t_1 = threading.Thread(target=work_1)</span><br><span class="line">    t_2 = threading.Thread(target=work_2)</span><br><span class="line">    t_2.start()</span><br><span class="line">    time.sleep(<span class="number">0.5</span>)<span class="comment">#sleep()控制了线程顺序</span></span><br><span class="line">    t_1.start()<span class="comment">#线程只能start一次</span></span><br><span class="line">    time.sleep(<span class="number">3</span>)</span><br><span class="line">    print(<span class="string">"num最后：%d\n"</span> %num)</span><br></pre></td></tr></table></figure>
+
+<p>通过运行结果，发现<code>work_2()</code>中的sleep(1)使得work_2的线程未执行完函数，num便被<code>work_1()</code>调用，所以work_1的num不是103；<br><br><br><img src="https://1j0ker.github.io/md_img/threading_1.jpg" alt="exmple1.md"><br><br></p>
+<h3 id="example2：多线程各自非顺序计算对全局变量的影响"><a href="#example2：多线程各自非顺序计算对全局变量的影响" class="headerlink" title="example2：多线程各自非顺序计算对全局变量的影响"></a>example2：多线程各自非顺序计算对全局变量的影响</h3><p><br>—————————————————————————-<br><strong>py代码：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">g_num = <span class="number">0</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_threading</span><span class="params">(num)</span>:</span></span><br><span class="line">    <span class="keyword">global</span> g_num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num):</span><br><span class="line">        g_num += <span class="number">1</span></span><br><span class="line">     </span><br><span class="line">    print(<span class="string">"work_threading ---- %d\n"</span> % g_num)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work</span><span class="params">(num)</span>:</span></span><br><span class="line">    <span class="keyword">global</span> g_num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num):</span><br><span class="line">        g_num += <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">    print(<span class="string">"work ---- %d\n"</span> % g_num)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">	print(<span class="string">"创建多线程之前g_num: %d"</span>%g_num)</span><br><span class="line"></span><br><span class="line">	t = threading.Thread(target=work_threading, args=(<span class="number">100000</span>,))</span><br><span class="line">	t.start()</span><br><span class="line">	<span class="comment">#time.sleep(1)</span></span><br><span class="line">	work(<span class="number">100000</span>)</span><br></pre></td></tr></table></figure>
+
+<p><em>看一下执行结果：</em></p>
+<p><img src="https://1j0ker.github.io/md_img/threading_val2.jpg" alt="exmple2.md"><br><br><br>&#8195;&#8195;能看到，每次执行结果都可能都不相同，原因就是，<code>work_threading()</code>线程调用时使其独自计算，代码继续下读，到<code>work()</code>导致在未完成完整的函数计算时，被双方调用的g_num可能是非最终结果（正常计算应该是100000），造成了最后参数的混乱不一；<br><em>（<code>work()</code>也可以是多线程函数，这里用普通循环函数，便于对比和理解）</em><br><br><br>可以在<code>work_threading()</code>和<code>work()</code>中添加<code>sleep()</code>,确保函数调用的按序进行，也就是example1中的<code>sleep()</code>影响全局变量原因；<br><br><br><img src="https://1j0ker.github.io/md_img/threading_val3.jpg" alt="exmple3.md"></p>
+<br>
+--------------
+
+<h3 id="test-1-多线程探测主机"><a href="#test-1-多线程探测主机" class="headerlink" title="test_1:多线程探测主机"></a>test_1:多线程探测主机</h3><p><em>测试一下我所在的ip段</em></p>
+<p><strong>py代码：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">#-*- coding:utf-8 -*-</span><br><span class="line"></span><br><span class="line">import threading</span><br><span class="line">import time</span><br><span class="line">import os		#调用os模块，启动cmd</span><br><span class="line"></span><br><span class="line">code = os.popen(&apos;chcp 65001&apos;)#cmd的GBK编码问题，转成utf-8</span><br><span class="line"></span><br><span class="line">def Check_ip(ip):</span><br><span class="line">    cmd_ip = &apos;ping -n 1 xxx.xxx.xxx.&apos; + str(ip)	# -n 1仅仅探测一个回包，速度更快</span><br><span class="line">    #print(cmd_ip)</span><br><span class="line">    check = os.popen(cmd_ip)</span><br><span class="line">    data = check.read()</span><br><span class="line">    #print(data)</span><br><span class="line">    if &apos;TTL&apos; in data:</span><br><span class="line">        print(&apos;%s is UP\n&apos; % cmd_ip)</span><br><span class="line">    time.sleep(0.5)</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    for i in range(1,255):</span><br><span class="line">        t = threading.Thread(target=Check_ip, args=(i, ))</span><br><span class="line">        t.start()</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<p>&#8195;&#8195;结果能感觉到，速度明显的加快，打印下进程：</p>
+<p><img src="https://1j0ker.github.io/md_img/threading_checkip1.jpg" alt="exmple4.md"></p>
+<p>###To be continued…</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/15/py_threading/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-UTS安装时问题总结" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
