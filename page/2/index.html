@@ -152,46 +152,110 @@
           <div id="js-content" class="content-ll">
             
   
-    <article id="post-py_threading" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-XFFsearch_real_ip" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/15/py_threading/">Python多线程的变量影响</a>
+      <a class="article-title" href="/2019/07/17/XFFsearch_real_ip/">寻找 X-Forwarded-For 的真实IP的一些理解(续)</a>
     </h1>
   
 
         
-        <a href="/2019/07/15/py_threading/" class="archive-article-date">
-  	<time datetime="2019-07-15T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-15</time>
+        <a href="/2019/07/17/XFFsearch_real_ip/" class="archive-article-date">
+  	<time datetime="2019-07-17T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-17</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="Python多线程的变量影响"><a href="#Python多线程的变量影响" class="headerlink" title="Python多线程的变量影响"></a>Python多线程的变量影响</h1><h3 id="example1：sleep-控制多线程的变量"><a href="#example1：sleep-控制多线程的变量" class="headerlink" title="example1：sleep()控制多线程的变量"></a>example1：sleep()控制多线程的变量</h3><hr>
-<p><strong>py代码：</strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">num = <span class="number">100</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_1</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> num</span><br><span class="line">    print(<span class="string">"work_1 ---- %d\n"</span> % num)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_2</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        num += <span class="number">1</span></span><br><span class="line">        print(<span class="string">"work_2 ---- %d\n"</span> % num)</span><br><span class="line">        time.sleep(<span class="number">1</span>)<span class="comment">#sleep()控制了work_2线程顺序</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    print(<span class="string">"num最初：%d\n"</span> %num)</span><br><span class="line">    t_1 = threading.Thread(target=work_1)</span><br><span class="line">    t_2 = threading.Thread(target=work_2)</span><br><span class="line">    t_2.start()</span><br><span class="line">    time.sleep(<span class="number">0.5</span>)<span class="comment">#sleep()控制了线程顺序</span></span><br><span class="line">    t_1.start()<span class="comment">#线程只能start一次</span></span><br><span class="line">    time.sleep(<span class="number">3</span>)</span><br><span class="line">    print(<span class="string">"num最后：%d\n"</span> %num)</span><br></pre></td></tr></table></figure>
-
-<p>通过运行结果，发现<code>work_2()</code>中的sleep(1)使得work_2的线程未执行完函数，num便被<code>work_1()</code>调用，所以work_1的num不是103；<br><br><br><img src="https://1j0ker.github.io/md_img/threading_1.jpg" alt="exmple1.md"><br><br></p>
-<h3 id="example2：多线程各自非顺序计算对全局变量的影响"><a href="#example2：多线程各自非顺序计算对全局变量的影响" class="headerlink" title="example2：多线程各自非顺序计算对全局变量的影响"></a>example2：多线程各自非顺序计算对全局变量的影响</h3><p><br>—————————————————————————-<br><strong>py代码：</strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">g_num = <span class="number">0</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_threading</span><span class="params">(num)</span>:</span></span><br><span class="line">    <span class="keyword">global</span> g_num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num):</span><br><span class="line">        g_num += <span class="number">1</span></span><br><span class="line">     </span><br><span class="line">    print(<span class="string">"work_threading ---- %d\n"</span> % g_num)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work</span><span class="params">(num)</span>:</span></span><br><span class="line">    <span class="keyword">global</span> g_num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num):</span><br><span class="line">        g_num += <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">    print(<span class="string">"work ---- %d\n"</span> % g_num)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">	print(<span class="string">"创建多线程之前g_num: %d"</span>%g_num)</span><br><span class="line"></span><br><span class="line">	t = threading.Thread(target=work_threading, args=(<span class="number">100000</span>,))</span><br><span class="line">	t.start()</span><br><span class="line">	<span class="comment">#time.sleep(1)</span></span><br><span class="line">	work(<span class="number">100000</span>)</span><br></pre></td></tr></table></figure>
-
-<p><em>看一下执行结果：</em></p>
-<p><img src="https://1j0ker.github.io/md_img/threading_val2.jpg" alt="exmple2.md"><br><br><br>&#8195;&#8195;能看到，每次执行结果都可能都不相同，原因就是，<code>work_threading()</code>线程调用时使其独自计算，代码继续下读，到<code>work()</code>导致在未完成完整的函数计算时，被双方调用的g_num可能是非最终结果（正常计算应该是100000），造成了最后参数的混乱不一；<br><em>（<code>work()</code>也可以是多线程函数，这里用普通循环函数，便于对比和理解）</em><br><br><br>可以在<code>work_threading()</code>和<code>work()</code>中添加<code>sleep()</code>,确保函数调用的按序进行，也就是example1中的<code>sleep()</code>影响全局变量原因；<br><br><br><img src="https://1j0ker.github.io/md_img/threading_val3.jpg" alt="exmple3.md"></p>
+        <br>
+<h1>寻找 X-Forwarded-For 的真实IP</h1>
 <br>
---------------
+*前言：为什么要寻找真实IP？*
+因为在实际项目中，用户ip的获取很重要。通过报障用户的ip来快速定位用户的请求日志，在威胁分析中定位攻击源目IP。
+<br>
+紧接上次的X-Forward-For的介绍，我们能了解到，XFF头中可能会存在真实IP，不真实的原因总结为两点：
 
-<h3 id="test-1-多线程探测主机"><a href="#test-1-多线程探测主机" class="headerlink" title="test_1:多线程探测主机"></a>test_1:多线程探测主机</h3><p><em>测试一下我所在的ip段</em></p>
-<p><strong>py代码：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">#-*- coding:utf-8 -*-</span><br><span class="line"></span><br><span class="line">import threading</span><br><span class="line">import time</span><br><span class="line">import os		#调用os模块，启动cmd</span><br><span class="line"></span><br><span class="line">code = os.popen(&apos;chcp 65001&apos;)#cmd的GBK编码问题，转成utf-8</span><br><span class="line"></span><br><span class="line">def Check_ip(ip):</span><br><span class="line">    cmd_ip = &apos;ping -n 1 xxx.xxx.xxx.&apos; + str(ip)	# -n 1仅仅探测一个回包，速度更快</span><br><span class="line">    #print(cmd_ip)</span><br><span class="line">    check = os.popen(cmd_ip)</span><br><span class="line">    data = check.read()</span><br><span class="line">    #print(data)</span><br><span class="line">    if &apos;TTL&apos; in data:</span><br><span class="line">        print(&apos;%s is UP\n&apos; % cmd_ip)</span><br><span class="line">    time.sleep(0.5)</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    for i in range(1,255):</span><br><span class="line">        t = threading.Thread(target=Check_ip, args=(i, ))</span><br><span class="line">        t.start()</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<ul>
+<li>人为修改HTTP包头的X-Forward-For,导致真实IP的混杂；</li>
+<li>用户的正向代理访问：这个暂时没有解决办法，而且也是我在做威胁分析时遇到的异常头疼的问题之一；</li>
+</ul>
+<p>所以，接下来，我所讨论的就是，当人为去修改XFF头时，我们能有什么办法去寻找到真实IP，或者说去防止这种情况的发生。</p>
+<hr>
+<br>
+<h3>如何获得真实IP？</h3>
+<br>
 
-<p>&#8195;&#8195;结果能感觉到，速度明显的加快，打印下进程：</p>
-<p><img src="https://1j0ker.github.io/md_img/threading_checkip1.jpg" alt="exmple4.md"></p>
-<p>###To be continued…</p>
+<ul>
+<li><h4>使用 X-Forwarded-For + Real IP 模块:</h4>
+可以使用nginx的 `ngx_http_realip_module` 模块，从 X-Forwarded-For 或其他属性中提取真实IP。此处以 X-Forwarded-For 结合该模块为例子，需要做两件事：</li>
+<li>请求途径的各代理需要设置 <code>proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for</code>;</li>
+<li>利用 realip 模块获取真实IP<br>这里proxy3的部分配置(proxy3将请求直接转发到后端服务)，如下：</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">  ...</span><br><span class="line">    location / &#123;</span><br><span class="line">        set_real_ip_from ip1(proxy1的IP); </span><br><span class="line">        real_ip_header    X-Forwarded-For;</span><br><span class="line">        real_ip_recursive on;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>set_real_ip_from</code>: 表示从何处获取真实IP(解决安全问题，只认可自己信赖的IP)，可以是IP或子网等， 可以设置多个set_real_ip_from，上面的例子中就设置的时Proxy1的IP；</li>
+<li><code>real_ip_header</code>：表示从HTTP包头的哪个header属性中获取真实IP；</li>
+<li><code>real_ip_recursive</code>：递归检索真实IP，若从 X-Forwarded-For 中获取，则需递归检索；若像从X-Real-IP中获取，则无需递归。</li>
+</ul>
+<p>基于上一章日志测试格式的测试数据，试验结果：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">"[proxy1]" 123.123.123.123 192.168.1.1, 192.168.1.2, 123.123.123.123 "GET /hello HTTP/1.1" 200</span><br><span class="line">"[proxy2]" 1.1.1.1(IP1) 192.168.1.1, 192.168.1.2, 123.123.123.123, 1.1.1.1 "GET /hello HTTP/1.0" 200</span><br><span class="line">"[proxy3]" 123.123.123.123 192.168.1.1, 192.168.1.2, 123.123.123.123, 1.1.1.1, 123.123.123.123 "GET /hello HTTP/1.0" 200</span><br></pre></td></tr></table></figure>
+
+<p>这里解释一下[Proxy3]中的第一个IP和最后一个IP为什么是我们的真实IP了：</p>
+<ul>
+<li>我们在Proxy3里的<code>set_real_ip_from</code>设置了真实IP的获取来源：Proxy1，而Proxy1 <code>$remote_addr</code>(再次强调，这个不可被更改)的就是我们的真实IP；</li>
+<li>而且在Proxy1中根据XFF的规则，此时用户的代理IP就是他本身的IP；</li>
+</ul>
+<p>最终，proxy3 的 <code>$remote_addr</code> 也拿到了客户端的真实IP 123.123.123.123，然后 proxy3 将 remote_addr 传递到后端服务中去；<br><br></p>
+<ul>
+<li><h4>使用X-Forwarded-For + 安全设置:</h4>
+由于客户端可以自行传递X-Forwarded-For，因此，可以在第一个代理处重置其值，达到忽略客户端传递的X-Forwarded-For的效果，因为proxy1的 `$remote_addr` 是客户端真实IP:
+
+</li>
+</ul>
+<p>在 proxy1 中进行如下配置：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">proxy_set_header X-Forwarded-For $remote_addr;</span><br></pre></td></tr></table></figure>
+
+<p>与此类似的是设置Proxy1中 X-Real-IP:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">proxy_set_header X-Real-IP $remote_addr;</span><br></pre></td></tr></table></figure>
+
+<p>配置下测试日志格式：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">log_format proxy1 '"[proxy1]" $http_x_real_ip "$request" $status';</span><br><span class="line">log_format proxy2 '"[proxy2]" $http_x_real_ip "$request" $status';</span><br><span class="line">log_format proxy3 '"[proxy3]" $http_x_real_ip "$request" $status';</span><br></pre></td></tr></table></figure>
+
+<p>看一下打印结果：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">"[proxy1]" - "GET /hello HTTP/1.1" 200</span><br><span class="line">"[proxy2]" 123.123.123.123 "GET /hello HTTP/1.0" 200</span><br><span class="line">"[proxy3]" 123.123.123.123 "GET /hello HTTP/1.0" 200</span><br></pre></td></tr></table></figure>
+
+<p>在最后的Proxy3中也打印出了真实IP：123.123.123.123</p>
+<hr>
+<br>
+<h2>网站使用CDN之后如何禁止恶意用户真实IP</h2>
+<br>
+这是前几天做威胁分析时遇到的麻烦问题；
+在威胁分析中，各种层出不断的恶意扫描、拉取、注入等图谋不轨行为令人头大，当然我们一般可以直接通过 iptables 、 Nginx 的 deny 指令或者是程序来 ban 掉这些恶意请求IP；
+但是对于套了一层 CDN 或代理的网站，这些方法可能就失效了。尤其是个人网站，可能就一台 VPS，然后套一个免费的 CDN 就行走在互联网了。并不是每个 CDN 都能精准的拦截各种恶意请求的，更闹心的是很多 CDN 还不支持用户在 CDN 上添加 BAN 规则...
+
+<p>基于上篇文章的内容的基础上，当网站部署了CDN后，用户又是何种访问模式呐？</p>
+<ul>
+<li>用户访问使用了 CDN 的网站<br>浏览器 –&gt; DNS 解析 –&gt; CDN 节点 –&gt; WEB 数据处理 –&gt; 数据吐到浏览器渲染展示</li>
+<li>用户通过代理上网访问了我们的网站<br>浏览器 –&gt; 代理上网 –&gt; DNS 解析 –&gt; CDN 节点 –&gt; WEB 数据处理 –&gt; 数据吐到浏览器渲染展示</li>
+</ul>
+<p>对于这两种访问模式，直接的<code>iptables -I INPUT -s 用户的ip -j DROP</code> 或者 <code>deny</code>都失去了作用，因为 iptables 和 deny 都只能针对直连 IP，而这2种模式中，WEB 服务器直连 IP 是 CDN 节点或者代理服务器，此时使用 iptable 或 deny 就只能把 CDN 节点 或代理 IP 给封了，可能误杀一大片正常用户了，而真正的罪魁祸首轻轻松松换一个代理 IP 又能继续请求了。</p>
+<p><strong>所以如何获取真实IP非常关键</strong><br>其实也就是利用Nginx上的http模块操作 <code>$http_x_forwarded_for</code>和<code>$clientRealIp</code>:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>获取用户真实IP，并赋值给变量$clientRealIP</span><br><span class="line">map $http_x_forwarded_for  $clientRealIp &#123;</span><br><span class="line">        ""      $remote_addr;</span><br><span class="line">        ~^(?P&lt;firstAddr&gt;[0-9\.]+),?.*$  $firstAddr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其实也就是上面讲到的，匹配了 <code>$http_x_forwarded_for</code> 的第一个值(安全设置下的X-Forward-For第一个值就为源IP)，而且代码中还配合使用了 <code>$remote_addr</code>，避免了直接访问下时 <code>$http_x_forwarded_for</code>为空；替代了传统的 <code>$remote_addr</code>；</p>
+<h4>其实都是对用户未使用高度匿名代理、普通匿名代理的处理</h4> 
+
+<p><a href="https://blog.csdn.net/bytxl/article/details/15334153" title="3种正向代理方式介绍" target="_blank" rel="noopener">3种正向代理方式的介绍</a></p>
+<p>既然已经拿到了真实 IP，利用Nginx的判断，<code>return 403</code>就好了；</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>如果真实IP为 123.123.123.123，那么返回403</span><br><span class="line">if ($clientRealIp ~* "121.42.0.18|121.42.0.19") &#123;</span><br><span class="line">        #add_header Content-Type text/plain;</span><br><span class="line">        return 403;</span><br><span class="line">        break;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>到这里我对<code>X-Forward-For</code>的一些理解就介绍完了，后面还有对3种代理方式的学习，以及透明代理，普通匿名代理和高级匿名代理的理解；<br>贴一下参考：<a href="https://blog.51cto.com/z00w00/1031287" title="透明代理、正向代理、反向代理" target="_blank" rel="noopener">透明代理、正向代理、反向代理</a></p>
 
       
 
@@ -215,7 +279,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/15/py_threading/">展开全文 >></a>
+          <a class="article-more-a" href="/2019/07/17/XFFsearch_real_ip/">展开全文 >></a>
         </p>
       
 
@@ -358,6 +422,99 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/07/15/X-Forward-f/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-py_threading" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/15/py_threading/">Python多线程的变量影响</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/15/py_threading/" class="archive-article-date">
+  	<time datetime="2019-07-15T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Python多线程的变量影响"><a href="#Python多线程的变量影响" class="headerlink" title="Python多线程的变量影响"></a>Python多线程的变量影响</h1><h3 id="example1：sleep-控制多线程的变量"><a href="#example1：sleep-控制多线程的变量" class="headerlink" title="example1：sleep()控制多线程的变量"></a>example1：sleep()控制多线程的变量</h3><hr>
+<p><strong>py代码：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">num = <span class="number">100</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_1</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> num</span><br><span class="line">    print(<span class="string">"work_1 ---- %d\n"</span> % num)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_2</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        num += <span class="number">1</span></span><br><span class="line">        print(<span class="string">"work_2 ---- %d\n"</span> % num)</span><br><span class="line">        time.sleep(<span class="number">1</span>)<span class="comment">#sleep()控制了work_2线程顺序</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    print(<span class="string">"num最初：%d\n"</span> %num)</span><br><span class="line">    t_1 = threading.Thread(target=work_1)</span><br><span class="line">    t_2 = threading.Thread(target=work_2)</span><br><span class="line">    t_2.start()</span><br><span class="line">    time.sleep(<span class="number">0.5</span>)<span class="comment">#sleep()控制了线程顺序</span></span><br><span class="line">    t_1.start()<span class="comment">#线程只能start一次</span></span><br><span class="line">    time.sleep(<span class="number">3</span>)</span><br><span class="line">    print(<span class="string">"num最后：%d\n"</span> %num)</span><br></pre></td></tr></table></figure>
+
+<p>通过运行结果，发现<code>work_2()</code>中的sleep(1)使得work_2的线程未执行完函数，num便被<code>work_1()</code>调用，所以work_1的num不是103；<br><br><br><img src="https://1j0ker.github.io/md_img/threading_1.jpg" alt="exmple1.md"><br><br></p>
+<h3 id="example2：多线程各自非顺序计算对全局变量的影响"><a href="#example2：多线程各自非顺序计算对全局变量的影响" class="headerlink" title="example2：多线程各自非顺序计算对全局变量的影响"></a>example2：多线程各自非顺序计算对全局变量的影响</h3><p><br>—————————————————————————-<br><strong>py代码：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">g_num = <span class="number">0</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_threading</span><span class="params">(num)</span>:</span></span><br><span class="line">    <span class="keyword">global</span> g_num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num):</span><br><span class="line">        g_num += <span class="number">1</span></span><br><span class="line">     </span><br><span class="line">    print(<span class="string">"work_threading ---- %d\n"</span> % g_num)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work</span><span class="params">(num)</span>:</span></span><br><span class="line">    <span class="keyword">global</span> g_num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num):</span><br><span class="line">        g_num += <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">    print(<span class="string">"work ---- %d\n"</span> % g_num)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">	print(<span class="string">"创建多线程之前g_num: %d"</span>%g_num)</span><br><span class="line"></span><br><span class="line">	t = threading.Thread(target=work_threading, args=(<span class="number">100000</span>,))</span><br><span class="line">	t.start()</span><br><span class="line">	<span class="comment">#time.sleep(1)</span></span><br><span class="line">	work(<span class="number">100000</span>)</span><br></pre></td></tr></table></figure>
+
+<p><em>看一下执行结果：</em></p>
+<p><img src="https://1j0ker.github.io/md_img/threading_val2.jpg" alt="exmple2.md"><br><br><br>&#8195;&#8195;能看到，每次执行结果都可能都不相同，原因就是，<code>work_threading()</code>线程调用时使其独自计算，代码继续下读，到<code>work()</code>导致在未完成完整的函数计算时，被双方调用的g_num可能是非最终结果（正常计算应该是100000），造成了最后参数的混乱不一；<br><em>（<code>work()</code>也可以是多线程函数，这里用普通循环函数，便于对比和理解）</em><br><br><br>可以在<code>work_threading()</code>和<code>work()</code>中添加<code>sleep()</code>,确保函数调用的按序进行，也就是example1中的<code>sleep()</code>影响全局变量原因；<br><br><br><img src="https://1j0ker.github.io/md_img/threading_val3.jpg" alt="exmple3.md"></p>
+<br>
+--------------
+
+<h3 id="test-1-多线程探测主机"><a href="#test-1-多线程探测主机" class="headerlink" title="test_1:多线程探测主机"></a>test_1:多线程探测主机</h3><p><em>测试一下我所在的ip段</em></p>
+<p><strong>py代码：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">#-*- coding:utf-8 -*-</span><br><span class="line"></span><br><span class="line">import threading</span><br><span class="line">import time</span><br><span class="line">import os		#调用os模块，启动cmd</span><br><span class="line"></span><br><span class="line">code = os.popen(&apos;chcp 65001&apos;)#cmd的GBK编码问题，转成utf-8</span><br><span class="line"></span><br><span class="line">def Check_ip(ip):</span><br><span class="line">    cmd_ip = &apos;ping -n 1 xxx.xxx.xxx.&apos; + str(ip)	# -n 1仅仅探测一个回包，速度更快</span><br><span class="line">    #print(cmd_ip)</span><br><span class="line">    check = os.popen(cmd_ip)</span><br><span class="line">    data = check.read()</span><br><span class="line">    #print(data)</span><br><span class="line">    if &apos;TTL&apos; in data:</span><br><span class="line">        print(&apos;%s is UP\n&apos; % cmd_ip)</span><br><span class="line">    time.sleep(0.5)</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    for i in range(1,255):</span><br><span class="line">        t = threading.Thread(target=Check_ip, args=(i, ))</span><br><span class="line">        t.start()</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<p>&#8195;&#8195;结果能感觉到，速度明显的加快，打印下进程：</p>
+<p><img src="https://1j0ker.github.io/md_img/threading_checkip1.jpg" alt="exmple4.md"></p>
+<p>###To be continued…</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/15/py_threading/">展开全文 >></a>
         </p>
       
 

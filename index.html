@@ -383,6 +383,105 @@ http://www.aaa.com/acb.php?url=////www.test.com//..</code></pre><p><strong>i.url
 
 
   
+    <article id="post-scrapy_proxyip" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/08/09/scrapy_proxyip/">scrapy设置随机Proxy</a>
+    </h1>
+  
+
+        
+        <a href="/2019/08/09/scrapy_proxyip/" class="archive-article-date">
+  	<time datetime="2019-08-09T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-09</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4>一、spider.py中直接设置proxy字段</h4>
+
+<p>我们可以直接在自己具体的爬虫程序中设置proxy字段,代码如下,直接在构造Request里面加上meta字段即可:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProxySpider</span><span class="params">(scrapy.Spider)</span>:</span></span><br><span class="line">    name = <span class="string">"Proxy"</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start_requests</span><span class="params">(self)</span>:</span></span><br><span class="line">        urls = [</span><br><span class="line">            <span class="string">'http://test_1.com/page/1/'</span>,</span><br><span class="line">            <span class="string">'http://test_2.com/page/2/'</span>,</span><br><span class="line">        ]</span><br><span class="line">        <span class="keyword">for</span> url <span class="keyword">in</span> urls:</span><br><span class="line">            <span class="keyword">yield</span> scrapy.Request(url=url, callback=self.parse, meta=&#123;<span class="string">'proxy'</span>: <span class="string">'http://proxy.yourproxy:8001'</span>&#125;)<span class="comment">#在request中直接设置代理字段</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> quote <span class="keyword">in</span> response.css(<span class="string">'div.quote'</span>):</span><br><span class="line">            <span class="keyword">yield</span> &#123;</span><br><span class="line">                <span class="string">'text'</span>: quote.css(<span class="string">'span.text::text'</span>).extract_first(),</span><br><span class="line">                <span class="string">'author'</span>: quote.css(<span class="string">'span small::text'</span>).extract_first(),</span><br><span class="line">                <span class="string">'tags'</span>: quote.css(<span class="string">'div.tags a.tag::text'</span>).extract(),</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
+
+<p>但这种方法并不实用，因为在爬取大量的页面时，当前IP极易被封禁。然而这里我们把代理IP写死了，改被封还是直接被封。</p>
+<p><strong>适用于IP被封禁，请求次数很少的场景</strong></p>
+<h4>二、Middlewares.py的请求重写</h4>
+
+<p>scrapy中已经为我们准备好了框架，这里的scrapy IP 的代理就是用这个原理实现的，重写了下载器中间件的<code>process_request(self,request,spider)</code>这个函数,这个函数的主要作用就是对request进行处理。</p>
+<p>Middlewares.py:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> random  </span><br><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProxMiddleware</span><span class="params">(object)</span>:</span></span><br><span class="line"><span class="comment">#proxy_list=[&#123;'http': 'http://proxy1:proxy_port1'&#125;,</span></span><br><span class="line">			 &#123;<span class="string">'http'</span>: <span class="string">'http://proxy2:proxy_port2'</span>&#125;,</span><br><span class="line">			]</span><br><span class="line">proxy_list=[</span><br><span class="line">    <span class="string">"http://proxy1:proxy_port1"</span>,</span><br><span class="line">    <span class="string">"http://proxy2:proxy_port2"</span>,</span><br><span class="line">    ]<span class="comment">#两种写法</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">process_request</span><span class="params">(self,request,spider)</span>:</span></span><br><span class="line">    <span class="comment"># if not request.meta['proxies']:</span></span><br><span class="line">    ip = random.choice(self.proxy_list)</span><br><span class="line">    print(ip)</span><br><span class="line">    request.meta[<span class="string">'proxy'</span>] = ip</span><br></pre></td></tr></table></figure>
+
+<p>settings.py:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">DOWNLOADER_MIDDLEWARES = &#123; <span class="string">'Proxy.proxy.proxMiddleware'</span>:<span class="number">400</span> &#125;<span class="comment">#setting中打开代理应用</span></span><br></pre></td></tr></table></figure>
+
+<p>给出一个代理列表，然后在这个列表中随机取出一个代理，设置在request中，其中<code>request.meta[&#39;proxy&#39;]</code>就是设置代理的格式</p>
+<p><strong>虽然代理IP多了，解决了多次单一请求容易被封禁问题，但是这些代理IP却不一定稳定存活，通常都是周期极短。</strong></p>
+<p>不想购买的话，只能尝试从  <a href="http://www.xicidaili.com" title="西刺网" target="_blank" rel="noopener">西刺网</a>  上去获得当前可能存活的proxy ip。所以尝试使用spider来实现：<br>正好也复习下，多线程的管理：<code>threading</code>,<code>BeautifulSoup</code>,<code>Queue</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> Queue</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Get_ips</span><span class="params">()</span>:</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,page)</span>:</span></span><br><span class="line">    self.ips=[]</span><br><span class="line">    self.urls=[]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(page):</span><br><span class="line">        self.urls.append(<span class="string">"http://www.xicidaili.com/nn/"</span> + str(i))</span><br><span class="line">    self.header = &#123;<span class="string">"User-Agent"</span>: <span class="string">'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0'</span>&#125;</span><br><span class="line">    <span class="comment">#self.file=open("ips",'w')</span></span><br><span class="line">    self.q=Queue.Queue()</span><br><span class="line">    self.Lock=threading.Lock()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_ips</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> url <span class="keyword">in</span> self.urls:</span><br><span class="line">        res = requests.get(url, headers=self.header)</span><br><span class="line">        soup = BeautifulSoup(res.text, <span class="string">'lxml'</span>)</span><br><span class="line">        ips = soup.find_all(<span class="string">'tr'</span>)</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, len(ips)):</span><br><span class="line">            ip = ips[i]</span><br><span class="line">            tds = ip.find_all(<span class="string">"td"</span>)</span><br><span class="line">            ip_temp = <span class="string">"http://"</span> + tds[<span class="number">1</span>].contents[<span class="number">0</span>] + <span class="string">":"</span> + tds[<span class="number">2</span>].contents[<span class="number">0</span>]</span><br><span class="line">            self.q.put(str(ip_temp))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">review_ips</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">not</span> self.q.empty():</span><br><span class="line">        ip=self.q.get()</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            proxy=&#123;<span class="string">"http"</span>: ip&#125;</span><br><span class="line">            <span class="comment">#print proxy</span></span><br><span class="line">            res = requests.get(<span class="string">"http://www.baidu.com"</span>, proxies=proxy,timeout=<span class="number">5</span>)<span class="comment">#通过请求百度看IP是否存活</span></span><br><span class="line">            self.Lock.acquire()</span><br><span class="line">            <span class="keyword">if</span> res.status_code == <span class="number">200</span>:</span><br><span class="line">                self.ips.append(ip)</span><br><span class="line">                print(ip)</span><br><span class="line">                self.Lock.release()</span><br><span class="line">        <span class="keyword">except</span> Exception:</span><br><span class="line">            print(<span class="string">'error'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">(self)</span>:</span></span><br><span class="line">    self.get_ips()</span><br><span class="line">    threads=[]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">40</span>):</span><br><span class="line">        threads.append(threading.Thread(target=self.review_ips,args=[]))</span><br><span class="line">    <span class="keyword">for</span> t <span class="keyword">in</span> threads:</span><br><span class="line">        t.start()</span><br><span class="line">    <span class="keyword">for</span> t <span class="keyword">in</span> threads:</span><br><span class="line">        t.join()</span><br><span class="line">    <span class="keyword">return</span> self.ips</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_ip</span><span class="params">()</span>:</span></span><br><span class="line">	proxy=Get_ips(x)<span class="comment">#想爬取x页的ip</span></span><br><span class="line">	<span class="keyword">return</span> proxy.main()</span><br><span class="line"></span><br><span class="line">get_ip()</span><br></pre></td></tr></table></figure>
+
+<p>这里用到了<code>BeautifulSoup</code>解析页面，然后将提取到的代理交给队列，然后再通过共享队列分配给线程，这里主要开启线程通过设置代理ip访问一次baidu，因为需要访问页面的ip比较多，时间比较长，因此要开起多个线程。</p>
+<p>然后根据爬取的存活ip结果去更新，上面的<code>proxy_lists</code></p>
+<h4>三、购买服务</h4>
+
+<p>对，能用钱解决的问题都不是问题，不管是代理上网，还是代理爬虫，都可以直接去购买相关服务。<br>比如 <a href="http://http.zhiliandaili.cn" title="快代理" target="_blank" rel="noopener">快代理</a> 、代理精灵这种,提供爬虫代理IP的接口，可以购买后调用，网站都有使用方法和源码，我就不再多说了。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/08/09/scrapy_proxyip/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-scrapy下载器中间件" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1400,163 +1499,6 @@ CSP虽然有着严格的白名单控制，但仍然只能减轻以偷取信息�
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/07/20/CSP的防护与绕过/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-XFFsearch_real_ip" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/17/XFFsearch_real_ip/">寻找 X-Forwarded-For 的真实IP的一些理解(续)</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/17/XFFsearch_real_ip/" class="archive-article-date">
-  	<time datetime="2019-07-17T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-17</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <br>
-<h1>寻找 X-Forwarded-For 的真实IP</h1>
-<br>
-*前言：为什么要寻找真实IP？*
-因为在实际项目中，用户ip的获取很重要。通过报障用户的ip来快速定位用户的请求日志，在威胁分析中定位攻击源目IP。
-<br>
-紧接上次的X-Forward-For的介绍，我们能了解到，XFF头中可能会存在真实IP，不真实的原因总结为两点：
-
-<ul>
-<li>人为修改HTTP包头的X-Forward-For,导致真实IP的混杂；</li>
-<li>用户的正向代理访问：这个暂时没有解决办法，而且也是我在做威胁分析时遇到的异常头疼的问题之一；</li>
-</ul>
-<p>所以，接下来，我所讨论的就是，当人为去修改XFF头时，我们能有什么办法去寻找到真实IP，或者说去防止这种情况的发生。</p>
-<hr>
-<br>
-<h3>如何获得真实IP？</h3>
-<br>
-
-<ul>
-<li><h4>使用 X-Forwarded-For + Real IP 模块:</h4>
-可以使用nginx的 `ngx_http_realip_module` 模块，从 X-Forwarded-For 或其他属性中提取真实IP。此处以 X-Forwarded-For 结合该模块为例子，需要做两件事：</li>
-<li>请求途径的各代理需要设置 <code>proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for</code>;</li>
-<li>利用 realip 模块获取真实IP<br>这里proxy3的部分配置(proxy3将请求直接转发到后端服务)，如下：</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">  ...</span><br><span class="line">    location / &#123;</span><br><span class="line">        set_real_ip_from ip1(proxy1的IP); </span><br><span class="line">        real_ip_header    X-Forwarded-For;</span><br><span class="line">        real_ip_recursive on;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><code>set_real_ip_from</code>: 表示从何处获取真实IP(解决安全问题，只认可自己信赖的IP)，可以是IP或子网等， 可以设置多个set_real_ip_from，上面的例子中就设置的时Proxy1的IP；</li>
-<li><code>real_ip_header</code>：表示从HTTP包头的哪个header属性中获取真实IP；</li>
-<li><code>real_ip_recursive</code>：递归检索真实IP，若从 X-Forwarded-For 中获取，则需递归检索；若像从X-Real-IP中获取，则无需递归。</li>
-</ul>
-<p>基于上一章日志测试格式的测试数据，试验结果：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">"[proxy1]" 123.123.123.123 192.168.1.1, 192.168.1.2, 123.123.123.123 "GET /hello HTTP/1.1" 200</span><br><span class="line">"[proxy2]" 1.1.1.1(IP1) 192.168.1.1, 192.168.1.2, 123.123.123.123, 1.1.1.1 "GET /hello HTTP/1.0" 200</span><br><span class="line">"[proxy3]" 123.123.123.123 192.168.1.1, 192.168.1.2, 123.123.123.123, 1.1.1.1, 123.123.123.123 "GET /hello HTTP/1.0" 200</span><br></pre></td></tr></table></figure>
-
-<p>这里解释一下[Proxy3]中的第一个IP和最后一个IP为什么是我们的真实IP了：</p>
-<ul>
-<li>我们在Proxy3里的<code>set_real_ip_from</code>设置了真实IP的获取来源：Proxy1，而Proxy1 <code>$remote_addr</code>(再次强调，这个不可被更改)的就是我们的真实IP；</li>
-<li>而且在Proxy1中根据XFF的规则，此时用户的代理IP就是他本身的IP；</li>
-</ul>
-<p>最终，proxy3 的 <code>$remote_addr</code> 也拿到了客户端的真实IP 123.123.123.123，然后 proxy3 将 remote_addr 传递到后端服务中去；<br><br></p>
-<ul>
-<li><h4>使用X-Forwarded-For + 安全设置:</h4>
-由于客户端可以自行传递X-Forwarded-For，因此，可以在第一个代理处重置其值，达到忽略客户端传递的X-Forwarded-For的效果，因为proxy1的 `$remote_addr` 是客户端真实IP:
-
-</li>
-</ul>
-<p>在 proxy1 中进行如下配置：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">proxy_set_header X-Forwarded-For $remote_addr;</span><br></pre></td></tr></table></figure>
-
-<p>与此类似的是设置Proxy1中 X-Real-IP:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">proxy_set_header X-Real-IP $remote_addr;</span><br></pre></td></tr></table></figure>
-
-<p>配置下测试日志格式：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">log_format proxy1 '"[proxy1]" $http_x_real_ip "$request" $status';</span><br><span class="line">log_format proxy2 '"[proxy2]" $http_x_real_ip "$request" $status';</span><br><span class="line">log_format proxy3 '"[proxy3]" $http_x_real_ip "$request" $status';</span><br></pre></td></tr></table></figure>
-
-<p>看一下打印结果：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">"[proxy1]" - "GET /hello HTTP/1.1" 200</span><br><span class="line">"[proxy2]" 123.123.123.123 "GET /hello HTTP/1.0" 200</span><br><span class="line">"[proxy3]" 123.123.123.123 "GET /hello HTTP/1.0" 200</span><br></pre></td></tr></table></figure>
-
-<p>在最后的Proxy3中也打印出了真实IP：123.123.123.123</p>
-<hr>
-<br>
-<h2>网站使用CDN之后如何禁止恶意用户真实IP</h2>
-<br>
-这是前几天做威胁分析时遇到的麻烦问题；
-在威胁分析中，各种层出不断的恶意扫描、拉取、注入等图谋不轨行为令人头大，当然我们一般可以直接通过 iptables 、 Nginx 的 deny 指令或者是程序来 ban 掉这些恶意请求IP；
-但是对于套了一层 CDN 或代理的网站，这些方法可能就失效了。尤其是个人网站，可能就一台 VPS，然后套一个免费的 CDN 就行走在互联网了。并不是每个 CDN 都能精准的拦截各种恶意请求的，更闹心的是很多 CDN 还不支持用户在 CDN 上添加 BAN 规则...
-
-<p>基于上篇文章的内容的基础上，当网站部署了CDN后，用户又是何种访问模式呐？</p>
-<ul>
-<li>用户访问使用了 CDN 的网站<br>浏览器 –&gt; DNS 解析 –&gt; CDN 节点 –&gt; WEB 数据处理 –&gt; 数据吐到浏览器渲染展示</li>
-<li>用户通过代理上网访问了我们的网站<br>浏览器 –&gt; 代理上网 –&gt; DNS 解析 –&gt; CDN 节点 –&gt; WEB 数据处理 –&gt; 数据吐到浏览器渲染展示</li>
-</ul>
-<p>对于这两种访问模式，直接的<code>iptables -I INPUT -s 用户的ip -j DROP</code> 或者 <code>deny</code>都失去了作用，因为 iptables 和 deny 都只能针对直连 IP，而这2种模式中，WEB 服务器直连 IP 是 CDN 节点或者代理服务器，此时使用 iptable 或 deny 就只能把 CDN 节点 或代理 IP 给封了，可能误杀一大片正常用户了，而真正的罪魁祸首轻轻松松换一个代理 IP 又能继续请求了。</p>
-<p><strong>所以如何获取真实IP非常关键</strong><br>其实也就是利用Nginx上的http模块操作 <code>$http_x_forwarded_for</code>和<code>$clientRealIp</code>:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>获取用户真实IP，并赋值给变量$clientRealIP</span><br><span class="line">map $http_x_forwarded_for  $clientRealIp &#123;</span><br><span class="line">        ""      $remote_addr;</span><br><span class="line">        ~^(?P&lt;firstAddr&gt;[0-9\.]+),?.*$  $firstAddr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>其实也就是上面讲到的，匹配了 <code>$http_x_forwarded_for</code> 的第一个值(安全设置下的X-Forward-For第一个值就为源IP)，而且代码中还配合使用了 <code>$remote_addr</code>，避免了直接访问下时 <code>$http_x_forwarded_for</code>为空；替代了传统的 <code>$remote_addr</code>；</p>
-<h4>其实都是对用户未使用高度匿名代理、普通匿名代理的处理</h4> 
-
-<p><a href="https://blog.csdn.net/bytxl/article/details/15334153" title="3种正向代理方式介绍" target="_blank" rel="noopener">3种正向代理方式的介绍</a></p>
-<p>既然已经拿到了真实 IP，利用Nginx的判断，<code>return 403</code>就好了；</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>如果真实IP为 123.123.123.123，那么返回403</span><br><span class="line">if ($clientRealIp ~* "121.42.0.18|121.42.0.19") &#123;</span><br><span class="line">        #add_header Content-Type text/plain;</span><br><span class="line">        return 403;</span><br><span class="line">        break;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>到这里我对<code>X-Forward-For</code>的一些理解就介绍完了，后面还有对3种代理方式的学习，以及透明代理，普通匿名代理和高级匿名代理的理解；<br>贴一下参考：<a href="https://blog.51cto.com/z00w00/1031287" title="透明代理、正向代理、反向代理" target="_blank" rel="noopener">透明代理、正向代理、反向代理</a></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/17/XFFsearch_real_ip/">展开全文 >></a>
         </p>
       
 

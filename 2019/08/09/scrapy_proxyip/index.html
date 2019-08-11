@@ -6,19 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>UTS安装时问题总结 | Hexo</title>
+  <title>scrapy设置随机Proxy | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="在学习UTS安装时，会遇到各种各样的问题，安装完成后，对各种出现的问题需要自我总结。 出现的问题及解决方案一、DELL R730 服务器1.    U盘安装centos 7.3：a)    DELL R730 F11进入BIOS，设置UEFI后，重启后再次进入F11，BIOS中选择从USB启动，开始安装Centos 7; b)    Centos 安装界面时，按e进入编辑，修改成正确的U盘名称：s">
+  <meta name="description" content="一、spider.py中直接设置proxy字段  我们可以直接在自己具体的爬虫程序中设置proxy字段,代码如下,直接在构造Request里面加上meta字段即可: 123456789101112131415161718class ProxySpider(scrapy.Spider):    name = &quot;Proxy&quot;    def start_requests(self):        ur">
+<meta name="keywords" content="To be continued...">
 <meta property="og:type" content="article">
-<meta property="og:title" content="UTS安装时问题总结">
-<meta property="og:url" content="http://yoursite.com/2019/07/12/UTS安装时问题总结/index.html">
+<meta property="og:title" content="scrapy设置随机Proxy">
+<meta property="og:url" content="http://yoursite.com/2019/08/09/scrapy_proxyip/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="在学习UTS安装时，会遇到各种各样的问题，安装完成后，对各种出现的问题需要自我总结。 出现的问题及解决方案一、DELL R730 服务器1.    U盘安装centos 7.3：a)    DELL R730 F11进入BIOS，设置UEFI后，重启后再次进入F11，BIOS中选择从USB启动，开始安装Centos 7; b)    Centos 安装界面时，按e进入编辑，修改成正确的U盘名称：s">
+<meta property="og:description" content="一、spider.py中直接设置proxy字段  我们可以直接在自己具体的爬虫程序中设置proxy字段,代码如下,直接在构造Request里面加上meta字段即可: 123456789101112131415161718class ProxySpider(scrapy.Spider):    name = &quot;Proxy&quot;    def start_requests(self):        ur">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-07-11T08:36:35.910Z">
+<meta property="og:updated_time" content="2019-08-11T10:56:40.965Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="UTS安装时问题总结">
-<meta name="twitter:description" content="在学习UTS安装时，会遇到各种各样的问题，安装完成后，对各种出现的问题需要自我总结。 出现的问题及解决方案一、DELL R730 服务器1.    U盘安装centos 7.3：a)    DELL R730 F11进入BIOS，设置UEFI后，重启后再次进入F11，BIOS中选择从USB启动，开始安装Centos 7; b)    Centos 安装界面时，按e进入编辑，修改成正确的U盘名称：s">
+<meta name="twitter:title" content="scrapy设置随机Proxy">
+<meta name="twitter:description" content="一、spider.py中直接设置proxy字段  我们可以直接在自己具体的爬虫程序中设置proxy字段,代码如下,直接在构造Request里面加上meta字段即可: 123456789101112131415161718class ProxySpider(scrapy.Spider):    name = &quot;Proxy&quot;    def start_requests(self):        ur">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -154,61 +155,53 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-UTS安装时问题总结" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-scrapy_proxyip" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      UTS安装时问题总结
+      scrapy设置随机Proxy
     </h1>
   
 
         
-        <a href="/2019/07/12/UTS安装时问题总结/" class="archive-article-date">
-  	<time datetime="2019-07-12T12:39:30.332Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-12</time>
+        <a href="/2019/08/09/scrapy_proxyip/" class="archive-article-date">
+  	<time datetime="2019-08-09T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-09</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>在学习UTS安装时，会遇到各种各样的问题，安装完成后，对各种出现的问题需要自我总结。</p>
-<h2 id="出现的问题及解决方案"><a href="#出现的问题及解决方案" class="headerlink" title="出现的问题及解决方案"></a>出现的问题及解决方案</h2><h3 id="一、DELL-R730-服务器"><a href="#一、DELL-R730-服务器" class="headerlink" title="一、DELL R730 服务器"></a>一、DELL R730 服务器</h3><h4 id="1-U盘安装centos-7-3："><a href="#1-U盘安装centos-7-3：" class="headerlink" title="1.    U盘安装centos 7.3："></a>1.    U盘安装centos 7.3：</h4><p>a)    DELL R730 F11进入BIOS，设置UEFI后，重启后再次进入F11，BIOS中选择从USB启动，开始安装Centos 7;</p>
-<p>b)    Centos 安装界面时，按e进入编辑，修改成正确的U盘名称：sd*，</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd /dev			#第一次无法查看，失败一次后，命令行查看自己的U盘名称</span><br></pre></td></tr></table></figure>
+        <h4>一、spider.py中直接设置proxy字段</h4>
 
-<p>安装路径改为 </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">… … =hd: /dev/sd* quiet</span><br></pre></td></tr></table></figure>
+<p>我们可以直接在自己具体的爬虫程序中设置proxy字段,代码如下,直接在构造Request里面加上meta字段即可:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProxySpider</span><span class="params">(scrapy.Spider)</span>:</span></span><br><span class="line">    name = <span class="string">"Proxy"</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start_requests</span><span class="params">(self)</span>:</span></span><br><span class="line">        urls = [</span><br><span class="line">            <span class="string">'http://test_1.com/page/1/'</span>,</span><br><span class="line">            <span class="string">'http://test_2.com/page/2/'</span>,</span><br><span class="line">        ]</span><br><span class="line">        <span class="keyword">for</span> url <span class="keyword">in</span> urls:</span><br><span class="line">            <span class="keyword">yield</span> scrapy.Request(url=url, callback=self.parse, meta=&#123;<span class="string">'proxy'</span>: <span class="string">'http://proxy.yourproxy:8001'</span>&#125;)<span class="comment">#在request中直接设置代理字段</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> quote <span class="keyword">in</span> response.css(<span class="string">'div.quote'</span>):</span><br><span class="line">            <span class="keyword">yield</span> &#123;</span><br><span class="line">                <span class="string">'text'</span>: quote.css(<span class="string">'span.text::text'</span>).extract_first(),</span><br><span class="line">                <span class="string">'author'</span>: quote.css(<span class="string">'span small::text'</span>).extract_first(),</span><br><span class="line">                <span class="string">'tags'</span>: quote.css(<span class="string">'div.tags a.tag::text'</span>).extract(),</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
 
-<p>c)    Centos 安装过程中，手动分区问题：</p>
-<pre><code>①确认正确的 File system 后，记得Update;
+<p>但这种方法并不实用，因为在爬取大量的页面时，当前IP极易被封禁。然而这里我们把代理IP写死了，改被封还是直接被封。</p>
+<p><strong>适用于IP被封禁，请求次数很少的场景</strong></p>
+<h4>二、Middlewares.py的请求重写</h4>
 
-②**/home**分区问题：有几块盘，就分几个**/home/sd*** 子目录，最后加上/home目录;</code></pre><p>d)    Centos安装完成后：强制常见User用户，建议系统启动后锁个屏，然后更换为/root用户登录；（防止UTS文件解压后，放入/home下，却发现实际在/home/User下，造成安装脚本的运行失败；</p>
-<h4 id="2-UTS-脚本配置："><a href="#2-UTS-脚本配置：" class="headerlink" title="2.    UTS 脚本配置："></a>2.    UTS 脚本配置：</h4><p>a)    UTS参数配置时，注意绑定的网卡(如<strong>em3</strong>)，后面选择透传网卡时不会再出现在选择列表；</p>
-<p>b)    在运行UTS安装脚本前，建议最大化终端，否则可能会出现分辨率显示不全问题；（在选择透传网卡）;</p>
-<p>c)    脚本安装完成后，提示<strong>reboot</strong>，再确认无error：后再重启；（syn…error脚本中语法错误可忽略）;</p>
-<p>d)    重启后：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">virsh list –all				#先确定uts_01是否runing</span><br></pre></td></tr></table></figure>
+<p>scrapy中已经为我们准备好了框架，这里的scrapy IP 的代理就是用这个原理实现的，重写了下载器中间件的<code>process_request(self,request,spider)</code>这个函数,这个函数的主要作用就是对request进行处理。</p>
+<p>Middlewares.py:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> random  </span><br><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProxMiddleware</span><span class="params">(object)</span>:</span></span><br><span class="line"><span class="comment">#proxy_list=[&#123;'http': 'http://proxy1:proxy_port1'&#125;,</span></span><br><span class="line">			 &#123;<span class="string">'http'</span>: <span class="string">'http://proxy2:proxy_port2'</span>&#125;,</span><br><span class="line">			]</span><br><span class="line">proxy_list=[</span><br><span class="line">    <span class="string">"http://proxy1:proxy_port1"</span>,</span><br><span class="line">    <span class="string">"http://proxy2:proxy_port2"</span>,</span><br><span class="line">    ]<span class="comment">#两种写法</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">process_request</span><span class="params">(self,request,spider)</span>:</span></span><br><span class="line">    <span class="comment"># if not request.meta['proxies']:</span></span><br><span class="line">    ip = random.choice(self.proxy_list)</span><br><span class="line">    print(ip)</span><br><span class="line">    request.meta[<span class="string">'proxy'</span>] = ip</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">virsh console uts_01		#在开始控制UTS虚拟机</span><br></pre></td></tr></table></figure>
+<p>settings.py:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">DOWNLOADER_MIDDLEWARES = &#123; <span class="string">'Proxy.proxy.proxMiddleware'</span>:<span class="number">400</span> &#125;<span class="comment">#setting中打开代理应用</span></span><br></pre></td></tr></table></figure>
 
-<hr>
-<h3 id="二、重点注意问题"><a href="#二、重点注意问题" class="headerlink" title="二、重点注意问题"></a>二、重点注意问题</h3><ol>
-<li>在执行UTS参数确定网卡安装脚本后，网卡与网桥绑定，不易卸载网桥；<br>（可进入/<strong>etc/sysconfig/network_config/vibr0</strong>处修改网桥ip）</li>
-</ol>
-<p>2    . 重装虚拟机：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a)	virsh shutdown uts_01		#关闭当前虚拟机uts_01</span><br><span class="line">	virsh undefine uts_01		#卸载现有虚拟机uts_01</span><br></pre></td></tr></table></figure>
+<p>给出一个代理列表，然后在这个列表中随机取出一个代理，设置在request中，其中<code>request.meta[&#39;proxy&#39;]</code>就是设置代理的格式</p>
+<p><strong>虽然代理IP多了，解决了多次单一请求容易被封禁问题，但是这些代理IP却不一定稳定存活，通常都是周期极短。</strong></p>
+<p>不想购买的话，只能尝试从  <a href="http://www.xicidaili.com" title="西刺网" target="_blank" rel="noopener">西刺网</a>  上去获得当前可能存活的proxy ip。所以尝试使用spider来实现：<br>正好也复习下，多线程的管理：<code>threading</code>,<code>BeautifulSoup</code>,<code>Queue</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> Queue</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Get_ips</span><span class="params">()</span>:</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,page)</span>:</span></span><br><span class="line">    self.ips=[]</span><br><span class="line">    self.urls=[]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(page):</span><br><span class="line">        self.urls.append(<span class="string">"http://www.xicidaili.com/nn/"</span> + str(i))</span><br><span class="line">    self.header = &#123;<span class="string">"User-Agent"</span>: <span class="string">'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0'</span>&#125;</span><br><span class="line">    <span class="comment">#self.file=open("ips",'w')</span></span><br><span class="line">    self.q=Queue.Queue()</span><br><span class="line">    self.Lock=threading.Lock()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_ips</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> url <span class="keyword">in</span> self.urls:</span><br><span class="line">        res = requests.get(url, headers=self.header)</span><br><span class="line">        soup = BeautifulSoup(res.text, <span class="string">'lxml'</span>)</span><br><span class="line">        ips = soup.find_all(<span class="string">'tr'</span>)</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, len(ips)):</span><br><span class="line">            ip = ips[i]</span><br><span class="line">            tds = ip.find_all(<span class="string">"td"</span>)</span><br><span class="line">            ip_temp = <span class="string">"http://"</span> + tds[<span class="number">1</span>].contents[<span class="number">0</span>] + <span class="string">":"</span> + tds[<span class="number">2</span>].contents[<span class="number">0</span>]</span><br><span class="line">            self.q.put(str(ip_temp))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">review_ips</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">not</span> self.q.empty():</span><br><span class="line">        ip=self.q.get()</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            proxy=&#123;<span class="string">"http"</span>: ip&#125;</span><br><span class="line">            <span class="comment">#print proxy</span></span><br><span class="line">            res = requests.get(<span class="string">"http://www.baidu.com"</span>, proxies=proxy,timeout=<span class="number">5</span>)<span class="comment">#通过请求百度看IP是否存活</span></span><br><span class="line">            self.Lock.acquire()</span><br><span class="line">            <span class="keyword">if</span> res.status_code == <span class="number">200</span>:</span><br><span class="line">                self.ips.append(ip)</span><br><span class="line">                print(ip)</span><br><span class="line">                self.Lock.release()</span><br><span class="line">        <span class="keyword">except</span> Exception:</span><br><span class="line">            print(<span class="string">'error'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">(self)</span>:</span></span><br><span class="line">    self.get_ips()</span><br><span class="line">    threads=[]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">40</span>):</span><br><span class="line">        threads.append(threading.Thread(target=self.review_ips,args=[]))</span><br><span class="line">    <span class="keyword">for</span> t <span class="keyword">in</span> threads:</span><br><span class="line">        t.start()</span><br><span class="line">    <span class="keyword">for</span> t <span class="keyword">in</span> threads:</span><br><span class="line">        t.join()</span><br><span class="line">    <span class="keyword">return</span> self.ips</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_ip</span><span class="params">()</span>:</span></span><br><span class="line">	proxy=Get_ips(x)<span class="comment">#想爬取x页的ip</span></span><br><span class="line">	<span class="keyword">return</span> proxy.main()</span><br><span class="line"></span><br><span class="line">get_ip()</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">b)	rm –r 现在虚拟机生成的.img		#删除uts_01生成的镜像文件；</span><br></pre></td></tr></table></figure>
+<p>这里用到了<code>BeautifulSoup</code>解析页面，然后将提取到的代理交给队列，然后再通过共享队列分配给线程，这里主要开启线程通过设置代理ip访问一次baidu，因为需要访问页面的ip比较多，时间比较长，因此要开起多个线程。</p>
+<p>然后根据爬取的存活ip结果去更新，上面的<code>proxy_lists</code></p>
+<h4>三、购买服务</h4>
 
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c)	重新执行安装脚本；</span><br></pre></td></tr></table></figure>
+<p>对，能用钱解决的问题都不是问题，不管是代理上网，还是代理爬虫，都可以直接去购买相关服务。<br>比如 <a href="http://http.zhiliandaili.cn" title="快代理" target="_blank" rel="noopener">快代理</a> 、代理精灵这种,提供爬虫代理IP的接口，可以购买后调用，网站都有使用方法和源码，我就不再多说了。</p>
 
-<p>3    . 注意参数配置的，分配内存的大小，太大时，在UTS的web端进行系统或规则包升级时，容易造成卡死。重启UTS虚拟机；</p>
-<p>4    . 安装完成UTS后，web端访问无流量显示：</p>
-<pre><code>a)    查看接口信息，是否接口网桥未开启；
-b)    联动安装TAM，查看是否已有事件生成，如果有，则是可能是接口显示问题，建议联系开发查看；</code></pre>
       
 
       
@@ -237,6 +230,17 @@ b)    联动安装TAM，查看是否已有事件生成，如果有，则是可�
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 
       
@@ -287,7 +291,7 @@ b)    联动安装TAM，查看是否已有事件生成，如果有，则是可�
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/07/12/UTS安装时问题总结/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/08/09/scrapy_proxyip/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -301,18 +305,18 @@ b)    联动安装TAM，查看是否已有事件生成，如果有，则是可�
   
 <nav id="article-nav">
   
-    <a href="/2019/07/15/py_threading/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2019/08/09/URL重定向/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          Python多线程的变量影响
+          URL跳转漏洞
         
       </div>
     </a>
   
   
-    <a href="/2019/07/11/py-spiders1/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">Python爬虫闯关练习</div>
+    <a href="/2019/08/08/scrapy下载器中间件/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Scrapy下载器中间件</div>
       <i class="icon-circle-right"></i>
     </a>
   
