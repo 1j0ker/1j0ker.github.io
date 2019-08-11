@@ -152,6 +152,105 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-scrapy_proxyip" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/08/11/scrapy_proxyip/">scrapy设置随机Proxy</a>
+    </h1>
+  
+
+        
+        <a href="/2019/08/11/scrapy_proxyip/" class="archive-article-date">
+  	<time datetime="2019-08-11T09:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-11</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4>一、spider.py中直接设置proxy字段</h4>
+
+<p>我们可以直接在自己具体的爬虫程序中设置proxy字段,代码如下,直接在构造Request里面加上meta字段即可:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProxySpider</span><span class="params">(scrapy.Spider)</span>:</span></span><br><span class="line">    name = <span class="string">"Proxy"</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start_requests</span><span class="params">(self)</span>:</span></span><br><span class="line">        urls = [</span><br><span class="line">            <span class="string">'http://test_1.com/page/1/'</span>,</span><br><span class="line">            <span class="string">'http://test_2.com/page/2/'</span>,</span><br><span class="line">        ]</span><br><span class="line">        <span class="keyword">for</span> url <span class="keyword">in</span> urls:</span><br><span class="line">            <span class="keyword">yield</span> scrapy.Request(url=url, callback=self.parse, meta=&#123;<span class="string">'proxy'</span>: <span class="string">'http://proxy.yourproxy:8001'</span>&#125;)<span class="comment">#在request中直接设置代理字段</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> quote <span class="keyword">in</span> response.css(<span class="string">'div.quote'</span>):</span><br><span class="line">            <span class="keyword">yield</span> &#123;</span><br><span class="line">                <span class="string">'text'</span>: quote.css(<span class="string">'span.text::text'</span>).extract_first(),</span><br><span class="line">                <span class="string">'author'</span>: quote.css(<span class="string">'span small::text'</span>).extract_first(),</span><br><span class="line">                <span class="string">'tags'</span>: quote.css(<span class="string">'div.tags a.tag::text'</span>).extract(),</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
+
+<p>但这种方法并不实用，因为在爬取大量的页面时，当前IP极易被封禁。然而这里我们把代理IP写死了，改被封还是直接被封。</p>
+<p><strong>适用于IP被封禁，请求次数很少的场景</strong></p>
+<h4>二、Middlewares.py的请求重写</h4>
+
+<p>scrapy中已经为我们准备好了框架，这里的scrapy IP 的代理就是用这个原理实现的，重写了下载器中间件的<code>process_request(self,request,spider)</code>这个函数,这个函数的主要作用就是对request进行处理。</p>
+<p>Middlewares.py:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> random  </span><br><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProxMiddleware</span><span class="params">(object)</span>:</span></span><br><span class="line"><span class="comment">#proxy_list=[&#123;'http': 'http://proxy1:proxy_port1'&#125;,</span></span><br><span class="line">			 &#123;<span class="string">'http'</span>: <span class="string">'http://proxy2:proxy_port2'</span>&#125;,</span><br><span class="line">			]</span><br><span class="line">proxy_list=[</span><br><span class="line">    <span class="string">"http://proxy1:proxy_port1"</span>,</span><br><span class="line">    <span class="string">"http://proxy2:proxy_port2"</span>,</span><br><span class="line">    ]<span class="comment">#两种写法</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">process_request</span><span class="params">(self,request,spider)</span>:</span></span><br><span class="line">    <span class="comment"># if not request.meta['proxies']:</span></span><br><span class="line">    ip = random.choice(self.proxy_list)</span><br><span class="line">    print(ip)</span><br><span class="line">    request.meta[<span class="string">'proxy'</span>] = ip</span><br></pre></td></tr></table></figure>
+
+<p>settings.py:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">DOWNLOADER_MIDDLEWARES = &#123; <span class="string">'Proxy.proxy.proxMiddleware'</span>:<span class="number">400</span> &#125;<span class="comment">#setting中打开代理应用</span></span><br></pre></td></tr></table></figure>
+
+<p>给出一个代理列表，然后在这个列表中随机取出一个代理，设置在request中，其中<code>request.meta[&#39;proxy&#39;]</code>就是设置代理的格式</p>
+<p><strong>虽然代理IP多了，解决了多次单一请求容易被封禁问题，但是这些代理IP却不一定稳定存活，通常都是周期极短。</strong></p>
+<p>不想购买的话，只能尝试从  <a href="http://www.xicidaili.com" title="西刺网" target="_blank" rel="noopener">西刺网</a>  上去获得当前可能存活的proxy ip。所以尝试使用spider来实现：<br>正好也复习下，多线程的管理：<code>threading</code>,<code>BeautifulSoup</code>,<code>Queue</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> Queue</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Get_ips</span><span class="params">()</span>:</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,page)</span>:</span></span><br><span class="line">    self.ips=[]</span><br><span class="line">    self.urls=[]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(page):</span><br><span class="line">        self.urls.append(<span class="string">"http://www.xicidaili.com/nn/"</span> + str(i))</span><br><span class="line">    self.header = &#123;<span class="string">"User-Agent"</span>: <span class="string">'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0'</span>&#125;</span><br><span class="line">    <span class="comment">#self.file=open("ips",'w')</span></span><br><span class="line">    self.q=Queue.Queue()</span><br><span class="line">    self.Lock=threading.Lock()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_ips</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> url <span class="keyword">in</span> self.urls:</span><br><span class="line">        res = requests.get(url, headers=self.header)</span><br><span class="line">        soup = BeautifulSoup(res.text, <span class="string">'lxml'</span>)</span><br><span class="line">        ips = soup.find_all(<span class="string">'tr'</span>)</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, len(ips)):</span><br><span class="line">            ip = ips[i]</span><br><span class="line">            tds = ip.find_all(<span class="string">"td"</span>)</span><br><span class="line">            ip_temp = <span class="string">"http://"</span> + tds[<span class="number">1</span>].contents[<span class="number">0</span>] + <span class="string">":"</span> + tds[<span class="number">2</span>].contents[<span class="number">0</span>]</span><br><span class="line">            self.q.put(str(ip_temp))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">review_ips</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">not</span> self.q.empty():</span><br><span class="line">        ip=self.q.get()</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            proxy=&#123;<span class="string">"http"</span>: ip&#125;</span><br><span class="line">            <span class="comment">#print proxy</span></span><br><span class="line">            res = requests.get(<span class="string">"http://www.baidu.com"</span>, proxies=proxy,timeout=<span class="number">5</span>)<span class="comment">#通过请求百度看IP是否存活</span></span><br><span class="line">            self.Lock.acquire()</span><br><span class="line">            <span class="keyword">if</span> res.status_code == <span class="number">200</span>:</span><br><span class="line">                self.ips.append(ip)</span><br><span class="line">                print(ip)</span><br><span class="line">                self.Lock.release()</span><br><span class="line">        <span class="keyword">except</span> Exception:</span><br><span class="line">            print(<span class="string">'error'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">(self)</span>:</span></span><br><span class="line">    self.get_ips()</span><br><span class="line">    threads=[]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">40</span>):</span><br><span class="line">        threads.append(threading.Thread(target=self.review_ips,args=[]))</span><br><span class="line">    <span class="keyword">for</span> t <span class="keyword">in</span> threads:</span><br><span class="line">        t.start()</span><br><span class="line">    <span class="keyword">for</span> t <span class="keyword">in</span> threads:</span><br><span class="line">        t.join()</span><br><span class="line">    <span class="keyword">return</span> self.ips</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_ip</span><span class="params">()</span>:</span></span><br><span class="line">	proxy=Get_ips(x)<span class="comment">#想爬取x页的ip</span></span><br><span class="line">	<span class="keyword">return</span> proxy.main()</span><br><span class="line"></span><br><span class="line">get_ip()</span><br></pre></td></tr></table></figure>
+
+<p>这里用到了<code>BeautifulSoup</code>解析页面，然后将提取到的代理交给队列，然后再通过共享队列分配给线程，这里主要开启线程通过设置代理ip访问一次baidu，因为需要访问页面的ip比较多，时间比较长，因此要开起多个线程。</p>
+<p>然后根据爬取的存活ip结果去更新，上面的<code>proxy_lists</code></p>
+<h4>三、购买服务</h4>
+
+<p>对，能用钱解决的问题都不是问题，不管是代理上网，还是代理爬虫，都可以直接去购买相关服务。<br>比如 <a href="http://http.zhiliandaili.cn" title="快代理" target="_blank" rel="noopener">快代理</a> 、代理精灵这种,提供爬虫代理IP的接口，可以购买后调用，网站都有使用方法和源码，我就不再多说了。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/08/11/scrapy_proxyip/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-URL重定向" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -354,105 +453,6 @@ http://www.aaa.com/acb.php?url=////www.test.com//..</code></pre><p><strong>i.url
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/08/09/URL重定向/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-scrapy_proxyip" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/08/09/scrapy_proxyip/">scrapy设置随机Proxy</a>
-    </h1>
-  
-
-        
-        <a href="/2019/08/09/scrapy_proxyip/" class="archive-article-date">
-  	<time datetime="2019-08-09T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-09</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4>一、spider.py中直接设置proxy字段</h4>
-
-<p>我们可以直接在自己具体的爬虫程序中设置proxy字段,代码如下,直接在构造Request里面加上meta字段即可:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProxySpider</span><span class="params">(scrapy.Spider)</span>:</span></span><br><span class="line">    name = <span class="string">"Proxy"</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start_requests</span><span class="params">(self)</span>:</span></span><br><span class="line">        urls = [</span><br><span class="line">            <span class="string">'http://test_1.com/page/1/'</span>,</span><br><span class="line">            <span class="string">'http://test_2.com/page/2/'</span>,</span><br><span class="line">        ]</span><br><span class="line">        <span class="keyword">for</span> url <span class="keyword">in</span> urls:</span><br><span class="line">            <span class="keyword">yield</span> scrapy.Request(url=url, callback=self.parse, meta=&#123;<span class="string">'proxy'</span>: <span class="string">'http://proxy.yourproxy:8001'</span>&#125;)<span class="comment">#在request中直接设置代理字段</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> quote <span class="keyword">in</span> response.css(<span class="string">'div.quote'</span>):</span><br><span class="line">            <span class="keyword">yield</span> &#123;</span><br><span class="line">                <span class="string">'text'</span>: quote.css(<span class="string">'span.text::text'</span>).extract_first(),</span><br><span class="line">                <span class="string">'author'</span>: quote.css(<span class="string">'span small::text'</span>).extract_first(),</span><br><span class="line">                <span class="string">'tags'</span>: quote.css(<span class="string">'div.tags a.tag::text'</span>).extract(),</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
-
-<p>但这种方法并不实用，因为在爬取大量的页面时，当前IP极易被封禁。然而这里我们把代理IP写死了，改被封还是直接被封。</p>
-<p><strong>适用于IP被封禁，请求次数很少的场景</strong></p>
-<h4>二、Middlewares.py的请求重写</h4>
-
-<p>scrapy中已经为我们准备好了框架，这里的scrapy IP 的代理就是用这个原理实现的，重写了下载器中间件的<code>process_request(self,request,spider)</code>这个函数,这个函数的主要作用就是对request进行处理。</p>
-<p>Middlewares.py:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> random  </span><br><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProxMiddleware</span><span class="params">(object)</span>:</span></span><br><span class="line"><span class="comment">#proxy_list=[&#123;'http': 'http://proxy1:proxy_port1'&#125;,</span></span><br><span class="line">			 &#123;<span class="string">'http'</span>: <span class="string">'http://proxy2:proxy_port2'</span>&#125;,</span><br><span class="line">			]</span><br><span class="line">proxy_list=[</span><br><span class="line">    <span class="string">"http://proxy1:proxy_port1"</span>,</span><br><span class="line">    <span class="string">"http://proxy2:proxy_port2"</span>,</span><br><span class="line">    ]<span class="comment">#两种写法</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">process_request</span><span class="params">(self,request,spider)</span>:</span></span><br><span class="line">    <span class="comment"># if not request.meta['proxies']:</span></span><br><span class="line">    ip = random.choice(self.proxy_list)</span><br><span class="line">    print(ip)</span><br><span class="line">    request.meta[<span class="string">'proxy'</span>] = ip</span><br></pre></td></tr></table></figure>
-
-<p>settings.py:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">DOWNLOADER_MIDDLEWARES = &#123; <span class="string">'Proxy.proxy.proxMiddleware'</span>:<span class="number">400</span> &#125;<span class="comment">#setting中打开代理应用</span></span><br></pre></td></tr></table></figure>
-
-<p>给出一个代理列表，然后在这个列表中随机取出一个代理，设置在request中，其中<code>request.meta[&#39;proxy&#39;]</code>就是设置代理的格式</p>
-<p><strong>虽然代理IP多了，解决了多次单一请求容易被封禁问题，但是这些代理IP却不一定稳定存活，通常都是周期极短。</strong></p>
-<p>不想购买的话，只能尝试从  <a href="http://www.xicidaili.com" title="西刺网" target="_blank" rel="noopener">西刺网</a>  上去获得当前可能存活的proxy ip。所以尝试使用spider来实现：<br>正好也复习下，多线程的管理：<code>threading</code>,<code>BeautifulSoup</code>,<code>Queue</code></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> Queue</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Get_ips</span><span class="params">()</span>:</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,page)</span>:</span></span><br><span class="line">    self.ips=[]</span><br><span class="line">    self.urls=[]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(page):</span><br><span class="line">        self.urls.append(<span class="string">"http://www.xicidaili.com/nn/"</span> + str(i))</span><br><span class="line">    self.header = &#123;<span class="string">"User-Agent"</span>: <span class="string">'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0'</span>&#125;</span><br><span class="line">    <span class="comment">#self.file=open("ips",'w')</span></span><br><span class="line">    self.q=Queue.Queue()</span><br><span class="line">    self.Lock=threading.Lock()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_ips</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> url <span class="keyword">in</span> self.urls:</span><br><span class="line">        res = requests.get(url, headers=self.header)</span><br><span class="line">        soup = BeautifulSoup(res.text, <span class="string">'lxml'</span>)</span><br><span class="line">        ips = soup.find_all(<span class="string">'tr'</span>)</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, len(ips)):</span><br><span class="line">            ip = ips[i]</span><br><span class="line">            tds = ip.find_all(<span class="string">"td"</span>)</span><br><span class="line">            ip_temp = <span class="string">"http://"</span> + tds[<span class="number">1</span>].contents[<span class="number">0</span>] + <span class="string">":"</span> + tds[<span class="number">2</span>].contents[<span class="number">0</span>]</span><br><span class="line">            self.q.put(str(ip_temp))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">review_ips</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">not</span> self.q.empty():</span><br><span class="line">        ip=self.q.get()</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            proxy=&#123;<span class="string">"http"</span>: ip&#125;</span><br><span class="line">            <span class="comment">#print proxy</span></span><br><span class="line">            res = requests.get(<span class="string">"http://www.baidu.com"</span>, proxies=proxy,timeout=<span class="number">5</span>)<span class="comment">#通过请求百度看IP是否存活</span></span><br><span class="line">            self.Lock.acquire()</span><br><span class="line">            <span class="keyword">if</span> res.status_code == <span class="number">200</span>:</span><br><span class="line">                self.ips.append(ip)</span><br><span class="line">                print(ip)</span><br><span class="line">                self.Lock.release()</span><br><span class="line">        <span class="keyword">except</span> Exception:</span><br><span class="line">            print(<span class="string">'error'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">(self)</span>:</span></span><br><span class="line">    self.get_ips()</span><br><span class="line">    threads=[]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">40</span>):</span><br><span class="line">        threads.append(threading.Thread(target=self.review_ips,args=[]))</span><br><span class="line">    <span class="keyword">for</span> t <span class="keyword">in</span> threads:</span><br><span class="line">        t.start()</span><br><span class="line">    <span class="keyword">for</span> t <span class="keyword">in</span> threads:</span><br><span class="line">        t.join()</span><br><span class="line">    <span class="keyword">return</span> self.ips</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_ip</span><span class="params">()</span>:</span></span><br><span class="line">	proxy=Get_ips(x)<span class="comment">#想爬取x页的ip</span></span><br><span class="line">	<span class="keyword">return</span> proxy.main()</span><br><span class="line"></span><br><span class="line">get_ip()</span><br></pre></td></tr></table></figure>
-
-<p>这里用到了<code>BeautifulSoup</code>解析页面，然后将提取到的代理交给队列，然后再通过共享队列分配给线程，这里主要开启线程通过设置代理ip访问一次baidu，因为需要访问页面的ip比较多，时间比较长，因此要开起多个线程。</p>
-<p>然后根据爬取的存活ip结果去更新，上面的<code>proxy_lists</code></p>
-<h4>三、购买服务</h4>
-
-<p>对，能用钱解决的问题都不是问题，不管是代理上网，还是代理爬虫，都可以直接去购买相关服务。<br>比如 <a href="http://http.zhiliandaili.cn" title="快代理" target="_blank" rel="noopener">快代理</a> 、代理精灵这种,提供爬虫代理IP的接口，可以购买后调用，网站都有使用方法和源码，我就不再多说了。</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/08/09/scrapy_proxyip/">展开全文 >></a>
         </p>
       
 
