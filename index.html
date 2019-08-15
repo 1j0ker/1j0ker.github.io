@@ -152,6 +152,138 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-CSRF" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/08/12/CSRF/">CSRF</a>
+    </h1>
+  
+
+        
+        <a href="/2019/08/12/CSRF/" class="archive-article-date">
+  	<time datetime="2019-08-12T09:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-12</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4>CSRF 简介</h4>
+
+<p>CSRF（Cross-site request forgery），中文名称：跨站请求伪造，也被称为：one click attack/session riding，缩写为：CSRF/XSRF。</p>
+<p>攻击者盗用了你的身份，以你的名义发送恶意请求。CSRF能够做的事情包括：以你名义发送邮件，发消息，盗取你的账号，甚至于购买商品，虚拟货币转账……造成的问题包括：个人隐私泄露以及财产安全。</p>
+<h3>简单原理</h3>
+
+<p>CSRF攻击的思想：</p>
+<p><img src="https://1j0ker.github.io/md_img/CSRF.png" alt="exmple1.md"></p>
+<p>受害者的访问历史：</p>
+<ul>
+<li>登录受信任网站A，并在本地生成Cookie。</li>
+<li>在不登出A的情况下，访问危险网站B。</li>
+</ul>
+<p><strong>危险网站B（结合XSS漏洞，或本身带有恶意代码）</strong>、<strong>受信任网站A（存在CSRF漏洞）</strong>。</p>
+<h4>示例1：</h4>
+
+<p>银行网站A，它以GET请求来完成银行转账的操作，如：<code>http://www.mybank.com/Transfer.php?toBankId=11&amp;money=1000</code></p>
+<p>　　危险网站B，它里面有一段HTML的代码如下：</p>
+<pre><code>&lt;img src=http://www.mybank.com/Transfer.php?toBankId=11&amp;money=1000&gt;</code></pre><p>首先，你登录了银行网站A，然后访问危险网站B，噢，这时你会发现你的银行账户少了1000块……</p>
+<p>原因是银行网站A违反了HTTP规范，使用GET请求更新资源。在访问危险网站B的之前，你已经登录了银行网站A，而B中的<img>以GET的方式请求第三方资源（这里的第三方就是指银行网站了，原本这是一个合法的请求，但这里被不法分子利用了），所以你的浏览器会带上你的银行网站A的Cookie发出Get请求，去获取资源<code>http://www.mybank.com/Transfer.php?toBankId=11&amp;money=1000</code>，结果银行网站服务器收到请求后，认为这是一个更新资源操作（转账操作），所以就立刻进行转账操作……</p>
+<h4>示例2：</h4>
+
+<p>为了杜绝上面的问题，银行决定改用POST请求完成转账操作。<br>银行网站A的WEB表单如下：　　</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">　　<span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"Transfer.php"</span> <span class="attr">method</span>=<span class="string">"POST"</span>&gt;</span></span><br><span class="line">　　　　<span class="tag">&lt;<span class="name">p</span>&gt;</span>ToBankId: <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"toBankId"</span> /&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">　　　　<span class="tag">&lt;<span class="name">p</span>&gt;</span>Money: <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"money"</span> /&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">　　　　<span class="tag">&lt;<span class="name">p</span>&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"Transfer"</span> /&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">　　<span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>后台处理页面Transfer.php如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">　　　　session_start();</span><br><span class="line">　　　　<span class="keyword">if</span> (<span class="keyword">isset</span>($_REQUEST[<span class="string">'toBankId'</span>] &amp;&amp;　<span class="keyword">isset</span>($_REQUEST[<span class="string">'money'</span>]))</span><br><span class="line">　　　　&#123;</span><br><span class="line">　　　　    buy_stocks($_REQUEST[<span class="string">'toBankId'</span>],　$_REQUEST[<span class="string">'money'</span>]);</span><br><span class="line">　　　　&#125;</span><br><span class="line">　　<span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>危险网站B，仍然只是包含那句HTML代码：</p>
+<pre><code>　&lt;img src=http://www.mybank.com/Transfer.php?toBankId=11&amp;money=1000&gt;</code></pre><p>和示例1中的操作一样，你首先登录了银行网站A，然后访问危险网站B，结果…..和示例1一样，你再次没了1000块～T_T，这次事故的原因是：银行后台使用了$_REQUEST去获取请求的数据，而$_REQUEST既可以获取GET请求的数据，也可以获取POST请求的数据，这就造成了在后台处理程序无法区分这到底是GET请求的数据还是POST请求的数据。在PHP中，可以使用$_GET和$_POST分别获取GET请求和POST请求的数据。在JAVA中，用于获取请求数据request一样存在不能区分GET请求数据和POST数据的问题。</p>
+<h4>示例3：</h4>
+
+<p>经过前面2个惨痛的教训，银行决定把获取请求数据的方法也改了，改用$_POST，只获取POST请求的数据，后台处理页面Transfer.php代码如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">　　　　session_start();</span><br><span class="line">　　　　<span class="keyword">if</span> (<span class="keyword">isset</span>($_POST[<span class="string">'toBankId'</span>] &amp;&amp;　<span class="keyword">isset</span>($_POST[<span class="string">'money'</span>]))</span><br><span class="line">　　　　&#123;</span><br><span class="line">　　　　    buy_stocks($_POST[<span class="string">'toBankId'</span>],　$_POST[<span class="string">'money'</span>]);</span><br><span class="line">　　　　&#125;</span><br><span class="line">　　<span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>然而，危险网站B与时俱进，它改了一下代码：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">　　<span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">　　　　<span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span></span><br><span class="line"><span class="javascript">　　　　　　<span class="function"><span class="keyword">function</span> <span class="title">steal</span>(<span class="params"></span>)</span></span></span><br><span class="line">　　　　　　&#123;</span><br><span class="line"><span class="javascript">          　　　　 iframe = <span class="built_in">document</span>.frames[<span class="string">"steal"</span>];</span></span><br><span class="line"><span class="javascript">　　     　　      iframe.document.Submit(<span class="string">"transfer"</span>);</span></span><br><span class="line">　　　　　　&#125;</span><br><span class="line">　　　　<span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">　　<span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"></span><br><span class="line">　　<span class="tag">&lt;<span class="name">body</span> <span class="attr">onload</span>=<span class="string">"steal()"</span>&gt;</span></span><br><span class="line">　　　　<span class="tag">&lt;<span class="name">iframe</span> <span class="attr">name</span>=<span class="string">"steal"</span> <span class="attr">display</span>=<span class="string">"none"</span>&gt;</span></span><br><span class="line">　　　　　　<span class="tag">&lt;<span class="name">form</span> <span class="attr">method</span>=<span class="string">"POST"</span> <span class="attr">name</span>=<span class="string">"transfer"</span>　<span class="attr">action</span>=<span class="string">"http://www.myBank.com/Transfer.php"</span>&gt;</span></span><br><span class="line">　　　　　　　　<span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">name</span>=<span class="string">"toBankId"</span> <span class="attr">value</span>=<span class="string">"11"</span>&gt;</span></span><br><span class="line">　　　　　　　　<span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">name</span>=<span class="string">"money"</span> <span class="attr">value</span>=<span class="string">"1000"</span>&gt;</span></span><br><span class="line">　　　　　　<span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line">　　　　<span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br><span class="line">　　<span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>如果用户仍是继续上面的操作，很不幸，结果将会是再次不见1000块……因为这里危险网站B暗地里发送了POST请求到银行!</p>
+<p>　　总结一下上面3个例子，CSRF主要的攻击模式基本上是以上的3种，其中以第1,2种最为严重，因为触发条件很简单，一个<img>就可以了，而第3种比较麻烦，需要使用JavaScript，所以使用的机会会比前面的少很多，但无论是哪种情况，只要触发了CSRF攻击，后果都有可能很严重。</p>
+<p>　　理解上面的3种攻击模式，其实可以看出，CSRF攻击是源于WEB的隐式身份验证机制！WEB的身份验证机制虽然可以保证一个请求是来自于某个用户的浏览器，但却无法保证该请求是用户批准发送的！</p>
+<h3>防御CSRF攻击：</h3>
+
+<p><strong>（1）验证 HTTP Referer 字段</strong></p>
+<p> 根据 HTTP 协议，在 HTTP 头中有一个字段叫 Referer，它记录了该 HTTP 请求的来源地址。在通常情况下，访问一个安全受限页面的请求来自于同一个网站，比如需要访问 <code>http://bank.example/withdraw?account=bob&amp;amount=1000000&amp;for=Mallory</code>，用户必须先登陆 bank.example，然后通过点击页面上的按钮来触发转账事件。这时，该转帐请求的 Referer 值就会是转账按钮所在的页面的 URL，通常是以 bank.example 域名开头的地址。而如果黑客要对银行网站实施 CSRF 攻击，他只能在他自己的网站构造请求，当用户通过黑客的网站发送请求到银行时，该请求的 Referer 是指向黑客自己的网站。因此，要防御 CSRF 攻击，银行网站只需要对于每一个转账请求验证其 Referer 值，如果是以 bank.example 开头的域名，则说明该请求是来自银行网站自己的请求，是合法的。如果 Referer 是其他网站的话，则有可能是黑客的 CSRF 攻击，拒绝该请求。</p>
+<p> 这种方法的显而易见的好处就是简单易行，网站的普通开发人员不需要操心 CSRF 的漏洞，只需要在最后给所有安全敏感的请求统一增加一个拦截器来检查 Referer 的值就可以。特别是对于当前现有的系统，不需要改变当前系统的任何已有代码和逻辑，没有风险，非常便捷。</p>
+<p><strong>然而</strong>这种方法并非万无一失。Referer 的值是由浏览器提供的，虽然 HTTP 协议上有明确的要求，但是每个浏览器对于 Referer 的具体实现可能有差别，并不能保证浏览器自身没有安全漏洞。使用验证 Referer 值的方法，就是把安全性都依赖于第三方（即浏览器）来保障，从理论上来讲，这样并不安全。事实上，对于某些浏览器，比如 IE6 或 FF2，目前已经有一些方法可以篡改 Referer 值。如果 bank.example 网站支持 IE6 浏览器，黑客完全可以把用户浏览器的 Referer 值设为以 bank.example 域名开头的地址，这样就可以通过验证，从而进行 CSRF 攻击。</p>
+<p>即便是使用最新的浏览器，黑客无法篡改 Referer 值，这种方法仍然有问题。因为 Referer 值会记录下用户的访问来源，有些用户认为这样会侵犯到他们自己的隐私权，特别是有些组织担心 Referer 值会把组织内网中的某些信息泄露到外网中。因此，用户自己可以设置浏览器使其在发送请求时不再提供 Referer。当他们正常访问银行网站时，网站会因为请求没有 Referer 值而认为是 CSRF 攻击，拒绝合法用户的访问。</p>
+<p><strong>（2）在请求地址中添加 token 并验证</strong></p>
+<p> CSRF 攻击之所以能够成功，是因为黑客可以完全伪造用户的请求，该请求中所有的用户验证信息都是存在于 cookie 中，因此黑客可以在不知道这些验证信息的情况下直接利用用户自己的 cookie 来通过安全验证。要抵御 CSRF，关键在于在请求中放入黑客所不能伪造的信息，并且该信息不存在于 cookie 之中。可以在 HTTP 请求中以参数的形式加入一个随机产生的 token，并在服务器端建立一个拦截器来验证这个 token，如果请求中没有 token 或者 token 内容不正确，则认为可能是 CSRF 攻击而拒绝该请求。</p>
+<p> 这种方法要比检查 Referer 要安全一些，token 可以在用户登陆后产生并放于 session 之中，然后在每次请求时把 token 从 session 中拿出，与请求中的 token 进行比对，但这种方法的难点在于如何把 token 以参数的形式加入请求。对于 GET 请求，token 将附在请求地址之后，这样 URL 就变成 <code>http://url?csrftoken=tokenvalue</code>。 而对于 POST 请求来说，要在 form 的最后加上</p>
+<pre><code>&lt;input type=”hidden” name=”csrftoken” value=”tokenvalue”/&gt;</code></pre><p>这样就把 token 以参数的形式加入请求了。但是，在一个网站中，可以接受请求的地方非常多，要对于每一个请求都加上 token 是很麻烦的，并且很容易漏掉，通常使用的方法就是在每次页面加载时，使用 javascript 遍历整个 dom 树，对于 dom 中所有的 a 和 form 标签后加入 token。这样可以解决大部分的请求，但是对于在页面加载之后动态生成的 html 代码，这种方法就没有作用，还需要程序员在编码时手动添加 token。</p>
+<p>该方法还有一个缺点是难以保证 token 本身的安全。特别是在一些论坛之类支持用户自己发表内容的网站，黑客可以在上面发布自己个人网站的地址。由于系统也会在这个地址后面加上 token，黑客可以在自己的网站上得到这个 token，并马上就可以发动 CSRF 攻击。为了避免这一点，系统可以在添加 token 的时候增加一个判断，如果这个链接是链到自己本站的，就在后面添加 token，如果是通向外网则不加。不过，即使这个 csrftoken 不以参数的形式附加在请求之中，黑客的网站也同样可以通过 Referer 来得到这个 token 值以发动 CSRF 攻击。这也是一些用户喜欢手动关闭浏览器 Referer 功能的原因。</p>
+<p><strong>（3）在 HTTP 头中自定义属性并验证</strong></p>
+<p>这种方法也是使用 token 并进行验证，和上一种方法不同的是，这里并不是把 token 以参数的形式置于 HTTP 请求之中，而是把它放到 HTTP 头中自定义的属性里。通过 XMLHttpRequest 这个类，可以一次性给所有该类请求加上 csrftoken 这个 HTTP 头属性，并把 token 值放入其中。这样解决了上种方法在请求中加入 token 的不便，同时，通过 XMLHttpRequest 请求的地址不会被记录到浏览器的地址栏，也不用担心 token 会透过 Referer 泄露到其他网站中去。</p>
+<p>然而这种方法的局限性非常大。XMLHttpRequest 请求通常用于 Ajax 方法中对于页面局部的异步刷新，并非所有的请求都适合用这个类来发起，而且通过该类请求得到的页面不能被浏览器所记录下，从而进行前进，后退，刷新，收藏等操作，给用户带来不便。另外，对于没有进行 CSRF 防护的遗留系统来说，要采用这种方法来进行防护，要把所有请求都改为 XMLHttpRequest 请求，这样几乎是要重写整个网站，这代价无疑是不能接受的。</p>
+<p><strong>总结：</strong>CSRF漏洞其实也非常受限，之前在一个客户哪里测试，是在一个收藏站点出现CSRF漏洞，这种和信息、资产不挂钩的洞的利用价值就很小了。但是还是要注意同域下的其他的敏感站点是否存在问题；</p>
+<p>详细请参考：<a href="https://www.cnblogs.com/hyddd/archive/2009/04/09/1432744.html" title="浅谈CSRF攻击方式" target="_blank" rel="noopener">https://www.cnblogs.com/hyddd/archive/2009/04/09/1432744.html</a></p>
+<p><a href="https://www.cnblogs.com/shikyoh/p/4959678.html" title="CSRF漏洞详细说明" target="_blank" rel="noopener">https://www.cnblogs.com/shikyoh/p/4959678.html</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/08/12/CSRF/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-龙族的青春" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -197,6 +329,7 @@
 <p>V5要流量我们可以给，<br>棍子哥技不如人我们也认，<br>没希望棍子哥多C，我只是想看一个还不肯认输的家伙还能在打上几场痛快的比赛。</p>
 <p>但是你一上来就给otto选个 露露 高强度消费人家不太好吧？<br>电棍就想好好打个比赛，放弃了稳赚不亏直播，背着“想火想疯了”的骂声，<br>就让打一把就下？<br>第一把是棍子哥的锅？<br>这就是V5?<br>这就是我们的青春？</p>
 <p>不，当然不是，otto的梦想也好，你我的青春也罢，只不过是资本的引流噱头罢了。</p>
+<p>我们以为小猴这一去，是要做齐天大圣，谁知道终究还是逃不过命运里的那个弼马温。<br>哪有这么多热血故事，无非是世事难料罢了。</p>
 <p>我们一直在笑称“V5上当了，V5上当了”</p>
 <p><strong>却没想到其实是“otto上当了，我们上当了”</strong></p>
 
@@ -1311,134 +1444,6 @@ To Be Continue... ...
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/07/29/Crawl_spider/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-scrapy初学习" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/22/scrapy初学习/">Scrapy框架初学习</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/22/scrapy初学习/" class="archive-article-date">
-  	<time datetime="2019-07-22T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-22</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3>Scrapy框架</h3>
-Scrapy是一个为了爬取网站数据，提取结构性数据而编写的应用框架。 其可以应用在数据挖掘，信息处理或存储历史数据等一系列的程序中。
-其最初是为了页面抓取 (更确切来说, 网络抓取 )所设计的， 也可以应用在获取API所返回的数据(例如 Amazon Associates Web Services ) 或者通用的网络爬虫。Scrapy用途广泛，可以用于数据挖掘、监测和自动化测试。
-
-<p>Scrapy 使用了 Twisted异步网络库来处理网络通讯。整体架构大致如下：<br><img src="https://1j0ker.github.io/md_img/scrapy%E6%A1%86%E6%9E%B6_1.jpg" alt="scrapy框架_1"></p>
-<h3> 实例</h3>
-
-<p><strong>利用scrapy框架爬取糗事百科内容</strong>：</p>
-<ul>
-<li>qsbk.py(spider.py)：</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="keyword">from</span> scrapy.http.response.html <span class="keyword">import</span> HtmlResponse</span><br><span class="line"><span class="keyword">from</span> scrapy.selector.unified <span class="keyword">import</span> SelectorList</span><br><span class="line"><span class="keyword">from</span> test_1.items <span class="keyword">import</span> Test1Item<span class="comment">#把在items里定义的传输数据类型导入</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">QsbkSpiderSpider</span><span class="params">(scrapy.Spider)</span>:</span></span><br><span class="line">    name = <span class="string">'qsbk_spider'</span></span><br><span class="line">    allowed_domains = [<span class="string">'qiushibaike.com'</span>]</span><br><span class="line">    start_urls = [<span class="string">'https://www.qiushibaike.com/text/page/1/'</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        duanzidivs = response.xpath(<span class="string">"//div[@id='content-left']/div"</span>)</span><br><span class="line">        <span class="comment"># print('---'*40)</span></span><br><span class="line">        <span class="comment"># print(type(duanzidivs))#返回selectorList类型，可遍历</span></span><br><span class="line">        <span class="comment"># print('---'*40)</span></span><br><span class="line">        <span class="keyword">for</span> duanzidiv <span class="keyword">in</span> duanzidivs:</span><br><span class="line">            <span class="comment">#duanzidiv为selector类型，依旧可以使用xpath</span></span><br><span class="line">            author = duanzidiv.xpath(<span class="string">".//h2/text()"</span>).get().strip()<span class="comment">#.//在当前目录下寻找h2;get()将selector型数据转换成为unicode;strip()去除空格；</span></span><br><span class="line">            content = duanzidiv.xpath(<span class="string">".//div[@class='content']//text()"</span>).getall()<span class="comment">#getall()返回list型数据；</span></span><br><span class="line">            content = <span class="string">""</span>.join(content).strip()<span class="comment">#join()将List型数据转化为字符串</span></span><br><span class="line">            <span class="comment">#print(author, '\n')</span></span><br><span class="line">            <span class="comment">#print(content,'\n')</span></span><br><span class="line">            <span class="comment">#duanzi = &#123;"author":author, "content":content&#125;#创建一个字典</span></span><br><span class="line">            <span class="comment">#yield = duanzi</span></span><br><span class="line">            item = Test1Item(author=author, content=content)<span class="comment">#直接调用定义好的类型</span></span><br><span class="line">            <span class="keyword">yield</span> item<span class="comment">#yield 把普通函数变成生成器；</span></span><br></pre></td></tr></table></figure>
-
-<p>这里的重点时<code>yield</code>，具体包含了scrapy爬虫的迭代运行 ：<a href="https://blog.csdn.net/qq_40695895/article/details/82882761" title="scrapy中 yield使用详解" target="_blank" rel="noopener">scrapy中 yield使用详解</a>；</p>
-<br>
-
-<ul>
-<li>利用scrapy的items的实例来传递参数，items.py：</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="comment"># Define here the models for your scraped items</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># See documentation in:</span></span><br><span class="line"><span class="comment"># https://docs.scrapy.org/en/latest/topics/items.html</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test1Item</span><span class="params">(scrapy.Item)</span>:</span></span><br><span class="line">    author = scrapy.Field()<span class="comment">#将需要传递的数据定义成类型；在spider里导入数据类型；</span></span><br><span class="line">    content = scrapy.Field()</span><br></pre></td></tr></table></figure>
-
-
-<p> 以及3种存储方式，比较优化，pipelines.py：</p>
-<p> 1.利用json模块，转换item；</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> io<span class="comment">#open莫名报错，使用io模块open</span></span><br><span class="line"><span class="comment">#1.利用json模块，转换item；</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test1Pipeline</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">         self.fp = io.open(<span class="string">'duanzi.json'</span>,<span class="string">'w'</span>,encoding=<span class="string">'utf-8'</span>)<span class="comment">#创建一个duanzi.json文件，写方式，可以在初始化函数中，也可以在open_spider()中</span></span><br><span class="line">     <span class="function"><span class="keyword">def</span> <span class="title">open_spider</span><span class="params">(self, spider)</span>:</span></span><br><span class="line">         print(<span class="string">"spider开始..."</span>)<span class="comment">#self.fp = open("duanzi.json",'w',encoding='utf-8')</span></span><br><span class="line">     <span class="function"><span class="keyword">def</span> <span class="title">process_item</span><span class="params">(self, item, spider)</span>:</span></span><br><span class="line">         item_json = json.dumps(dict(item), ensure_ascii=<span class="literal">False</span>)<span class="comment">#注意item要先转成程字典形式；把spider中传过来的duanzi转化成为json类型;ensure_ascii=False保存成中文</span></span><br><span class="line">         self.fp.write(item_json+<span class="string">'\n'</span>)<span class="comment">#将duanzi写入文件</span></span><br><span class="line">         <span class="keyword">return</span> item</span><br><span class="line">     <span class="function"><span class="keyword">def</span> <span class="title">close_spider</span><span class="params">(self, spider)</span>:</span></span><br><span class="line">         self.fp.close()<span class="comment">#关闭文件</span></span><br><span class="line">         print(<span class="string">"spider结束"</span>)</span><br></pre></td></tr></table></figure>
-
-<p>2.使用exporters.JsonItemExporter模块，bytes写入;结果一个列表内放所有字典：先将item数据放入内存中，但item过大时，消耗内存</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#-*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">from</span> scrapy.exporters <span class="keyword">import</span> JsonItemExporter</span><br><span class="line"><span class="comment">#2.使用exporters.JsonItemExporter模块，bytes写入;结果一个列表内放所有字典：先将item数据放入内存中，item过大时，消耗内存</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test1Pipeline</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.fp = io.open(<span class="string">'duanzi.json'</span>,<span class="string">'wb'</span>)<span class="comment">#创建一个duanzi.json文件，二进制写方式，二进制方法就没有编码了</span></span><br><span class="line">        self.exporter = JsonItemExporter(self.fp,ensure_ascii=<span class="literal">False</span>,encoding=<span class="string">'utf-8'</span>)</span><br><span class="line">        self.exporter.start_exporting()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">open_spider</span><span class="params">(self, spider)</span>:</span></span><br><span class="line">        print(<span class="string">"spider开始..."</span>)<span class="comment">#self.fp = io.open('duanzi.json','wb')</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_item</span><span class="params">(self, item, spider)</span>:</span></span><br><span class="line">        self.exporter.export_item(item)</span><br><span class="line">        <span class="keyword">return</span> item</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">close_spider</span><span class="params">(self, spider)</span>:</span></span><br><span class="line">        self.exporter.finish_exporting()</span><br><span class="line">        self.fp.close()<span class="comment">#关闭文件</span></span><br><span class="line">        print(<span class="string">"spider结束"</span>)</span><br></pre></td></tr></table></figure>
-
-<p>3.使用exporters.JsonLinesItemExporter模块，bytes写入;结果一个字典一行,清晰安全不占用内存：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#-*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">from</span> scrapy.exporters <span class="keyword">import</span> JsonLinesItemExporter</span><br><span class="line"><span class="comment">#3.使用exporters.JsonLinesItemExporter模块，bytes写入;结果一个字典一行</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test1Pipeline</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.fp = io.open(<span class="string">'duanzi.json'</span>,<span class="string">'wb'</span>)<span class="comment">#创建一个duanzi.json文件，二进制写方式，二进制方法就没有编码了</span></span><br><span class="line">        self.exporter = JsonLinesItemExporter(self.fp,ensure_ascii=<span class="literal">False</span>,encoding=<span class="string">'utf-8'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">open_spider</span><span class="params">(self, spider)</span>:</span></span><br><span class="line">        print(<span class="string">"spider开始..."</span>)<span class="comment">#self.fp = io.open('duanzi.json','wb')</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_item</span><span class="params">(self, item, spider)</span>:</span></span><br><span class="line">        self.exporter.export_item(item)</span><br><span class="line">        <span class="keyword">return</span> item</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">close_spider</span><span class="params">(self, spider)</span>:</span></span><br><span class="line">        self.fp.close()<span class="comment">#关闭文件</span></span><br><span class="line">        print(<span class="string">"spider结束"</span>)</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>settings.py的参数不要忘记设置：</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ROBOTSTXT_OBEY = <span class="literal">False</span><span class="comment">#关闭查找robottxt页面</span></span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"> DEFAULT_REQUEST_HEADERS = &#123;</span><br><span class="line">   <span class="string">'Accept'</span>: <span class="string">'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'</span>,</span><br><span class="line">   <span class="string">'Accept-Language'</span>: <span class="string">'en'</span>,</span><br><span class="line">    <span class="string">'User-Agent'</span>:<span class="string">'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0'</span></span><br><span class="line">&#125;<span class="comment">#设置常用头信息</span></span><br></pre></td></tr></table></figure>
-
-
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> ITEM_PIPELINES = &#123;</span><br><span class="line">   <span class="string">'test_1.pipelines.Test1Pipeline'</span>: <span class="number">300</span>,<span class="comment">#值越小越先执行</span></span><br><span class="line">&#125;<span class="comment">#开启pipelines</span></span><br></pre></td></tr></table></figure>
-
-
-<p><strong>效果：</strong><br>爬取的数据被存放在duanzi.json中：<br><img src="https://1j0ker.github.io/md_img/scrapy%E6%A1%86%E6%9E%B6_2.jpg" alt="scrapy框架_2"></p>
-<h4>多页面爬取</h4>
-
-<p>还是寻找页码所在的特征：</p>
-<ul>
-<li>在当前<code>&lt;div&gt;</code>标签下的最后一个<code>&lt;li&gt;</code>里存放着下一页的url;</li>
-<li>在最后一页，也就是13页下，<code>&lt;li&gt;</code>标签里没有存放下一页的链接；<br><img src="https://1j0ker.github.io/md_img/scrapy%E6%A1%86%E6%9E%B6_3.jpg" alt="scrapy框架_3"></li>
-</ul>
-<p><img src="https://1j0ker.github.io/md_img/scrapy%E6%A1%86%E6%9E%B6_4.jpg" alt="scrapy框架_4"></p>
-<p>所以可以通过判断是否能获取到<code>next_url</code>来控制爬取的页数：<br><strong>qsbk.py(spider):</strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="keyword">from</span> scrapy.http.response.html <span class="keyword">import</span> HtmlResponse</span><br><span class="line"><span class="keyword">from</span> scrapy.selector.unified <span class="keyword">import</span> SelectorList</span><br><span class="line"><span class="keyword">from</span> test_1.items <span class="keyword">import</span> Test1Item<span class="comment">#把在items里定义的传输数据类型导入</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">QsbkSpiderSpider</span><span class="params">(scrapy.Spider)</span>:</span></span><br><span class="line">    name = <span class="string">'qsbk_spider'</span></span><br><span class="line">    allowed_domains = [<span class="string">'qiushibaike.com'</span>]</span><br><span class="line">    start_urls = [<span class="string">'https://www.qiushibaike.com/text/page/1/'</span>]</span><br><span class="line">    base_domain = <span class="string">'https://www.qiushibaike.com'</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        duanzidivs = response.xpath(<span class="string">"//div[@id='content-left']/div"</span>)</span><br><span class="line">        <span class="comment"># print('---'*40)</span></span><br><span class="line">        <span class="comment"># print(type(duanzidivs))#返回selectorList类型，可遍历</span></span><br><span class="line">        <span class="comment"># print('---'*40)</span></span><br><span class="line">        <span class="keyword">for</span> duanzidiv <span class="keyword">in</span> duanzidivs:</span><br><span class="line">            <span class="comment">#duanzidiv为selector类型，依旧可以使用xpath</span></span><br><span class="line">            author = duanzidiv.xpath(<span class="string">".//h2/text()"</span>).get().strip()<span class="comment">#.//在当前目录下寻找h2;get()将selector型数据转换成为unicode;strip()去除空格；</span></span><br><span class="line">            content = duanzidiv.xpath(<span class="string">".//div[@class='content']//text()"</span>).getall()<span class="comment">#getall()返回list型数据；</span></span><br><span class="line">            content = <span class="string">""</span>.join(content).strip()<span class="comment">#join()将List型数据转化为字符串</span></span><br><span class="line">            <span class="comment">#print(author, '\n')</span></span><br><span class="line">            <span class="comment">#print(content,'\n')</span></span><br><span class="line">            <span class="comment">#duanzi = &#123;"author":author, "content":content&#125;#创建一个字典</span></span><br><span class="line">            <span class="comment">#yield = duanzi</span></span><br><span class="line">            item = Test1Item(author=author, content=content)<span class="comment">#直接调用定义好的类型</span></span><br><span class="line">            <span class="keyword">yield</span> item<span class="comment">#yield 把普通函数变成生成器；</span></span><br><span class="line">        next_url = response.xpath(<span class="string">"//ul[@class='pagination']/li[last()]/a/@href"</span>).get()<span class="comment">#取最后一个&lt;li&gt;标签，如果里面没有&lt;a href=''&gt;标签内容了，最说明是最后一页了</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> next_url:</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            page_num = self.base_domain+next_url</span><br><span class="line">            print(page_num)</span><br><span class="line">            <span class="keyword">yield</span> scrapy.Request(page_num,callback=self.parse)<span class="comment">#利用Request中的callback再次调用解析parse(),注意链接双方同类型</span></span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/22/scrapy初学习/">展开全文 >></a>
         </p>
       
 
