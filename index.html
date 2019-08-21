@@ -159,7 +159,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/08/16/HTTP报头/">CSRF</a>
+      <a class="article-title" href="/2019/08/16/HTTP报头/">HTTP报头</a>
     </h1>
   
 
@@ -181,12 +181,12 @@
 <p>在普通报头中，有少数报头域用于所有的请求和响应消息，但并不用于被传输的实体，只用于传输的消息。</p>
 <p><strong>eg：</strong><br><code>Cache-Control</code>   用于指定缓存指令，缓存指令是单向的（响应中出现的缓存指令在请求中未必会出现），且是独立的（一个消息的缓存指令不会影响另一个消息处理的缓存机制），HTTP1.0使用的类似的报头域为Pragma。<br>请求时的缓存指令包括：<code>no-cache</code>（用于指示请求或响应消息不能缓存）、<code>no-store、max-age</code>、<code>max-stale</code>、<code>min-fresh</code>、<code>only-if-cached</code>;</p>
 <p>响应时的缓存指令包括：<code>public</code>、<code>private</code>、<code>no-cache</code>、<code>no-store</code>、<code>no-transform</code>、<code>must-revalidate</code>、<code>proxy-revalidate</code>、<code>max-age</code>、<code>s-maxage</code>.</p>
-<p><strong>eg：</strong><br>为了指示IE浏览器（客户端）不要缓存页面，服务器端的JSP程序可以编写如下：<code>response.sehHeader</code>(“Cache-Control”,”no-cache”);<br>//response.setHeader(“Pragma”,”no-cache”);作用相当于上述代码，通常两者//合用<br>这句代码将在发送的响应消息中设置普通报头域：<code>Cache-Control:no-cache</code></p>
+<p><strong>eg：</strong><br>为了指示IE浏览器（客户端）不要缓存页面，服务器端的JSP程序可以编写如下：<code>response.sehHeader(&quot;Cache-Control&quot;,&quot;no-cache&quot;)</code>;<br>//response.setHeader(“Pragma”,”no-cache”);作用相当于上述代码，通常两者//合用<br>这句代码将在发送的响应消息中设置普通报头域：<code>Cache-Control:no-cache</code></p>
 <p><code>Date</code>普通报头域表示消息产生的日期和时间</p>
 <p><code>Connection</code>普通报头域允许发送指定连接的选项。例如指定连接是连续，或者指定“close”选项，通知服务器，在响应完成后，关闭连接。</p>
 <h5>二、请求报头</h5>
 
-<p>请求报头允许客户端向服务器端传递请求的附加信息以及客户端自身的信息。<br>常用的请求报头 <code>Accept</code><br>Accept请求报头域用于指定客户端接受哪些类型的信息。<strong>eg：</strong><code>Accept：image/gif</code>，表明客户端希望接受GIF图象格式的资源；Accept：text/html，表明客户端希望接受html文本。</p>
+<p>请求报头允许客户端向服务器端传递请求的附加信息以及客户端自身的信息。<br>常用的请求报头：<br><code>Accept</code><br>Accept请求报头域用于指定客户端接受哪些类型的信息。<strong>eg：</strong><code>Accept：image/gif</code>，表明客户端希望接受GIF图象格式的资源；Accept：text/html，表明客户端希望接受html文本。</p>
 <p><code>Accept-Charset</code><br>Accept-Charset请求报头域用于指定客户端接受的字符集。<strong>eg：</strong><code>Accept-Charset:iso-8859-1,gb2312</code>.如果在请求消息中没有设置这个域，缺省是任何字符集都可以接受。</p>
 <p><code>Accept-Encoding</code><br>Accept-Encoding请求报头域类似于Accept，但是它是用于指定可接受的内容编码。<strong>eg：</strong><code>Accept-Encoding:gzip.deflate</code>.如果请求消息中没有设置这个域服务器假定客户端对各种内容编码都可以接受。</p>
 <p><code>Accept-Language</code><br>Accept-Language请求报头域类似于Accept，但是它是用于指定一种自然语言。<strong>eg：</strong><code>Accept-Language:zh-cn</code>.如果请求消息中没有设置这个报头域，服务器假定客户端对各种语言都可以接受。</p>
@@ -209,12 +209,16 @@
 请求和响应消息都可以传送一个实体。一个实体由实体报头域和实体正文组成，但并不是说实体报头域和实体正文要在一起发送，可以只发送实体报头域。实体报头定义了关于实体正文（eg：有无实体正文）和请求所标识的资源的元信息。
 常用的实体报头
 
-<p><code>Content-Encoding</code><br>Content-Encoding实体报头域被用作媒体类型的修饰符，它的值指示了已经被应用到实体正文的附加内容的编码，因而要获得Content-Type报头域中所引用的媒体类型，必须采用相应的解码机制。<code>Content-Encoding</code>这样用于记录文档的压缩方法，<strong>eg：</strong><code>Content-Encoding：gzip</code></p>
-<p><code>Content-Language</code><br>Content-Language实体报头域描述了资源所用的自然语言。没有设置该域则认为实体内容将提供给所有的语言阅读者。<strong>eg：</strong><code>Content-Language:daContent-Length</code></p>
+<p><code>Content-Encoding</code><br>Content-Encoding实体报头域被用作媒体类型的修饰符，它的值指示了已经被应用到实体正文的附加内容的编码，因而要获得Content-Type报头域中所引用的媒体类型，必须采用相应的解码机制。<code>Content-Encoding</code>这样用于记录文档的压缩方法.</p>
+<p><strong>eg：</strong><br><code>Content-Encoding：gzip</code></p>
+<p><code>Content-Language</code><br>Content-Language实体报头域描述了资源所用的自然语言。没有设置该域则认为实体内容将提供给所有的语言阅读者。</p>
+<p><strong>eg：</strong><br><code>Content-Language:daContent-Length</code></p>
 <p><code>Content-Length</code>实体报头域用于指明实体正文的长度，以字节方式存储的十进制数字来表示。</p>
-<p><code>Content-Type</code><br>Content-Type实体报头域用语指明发送给接收者的实体正文的媒体类型。<br><strong>eg：</strong><br><code>Content-Type:text/html;charset=ISO-8859-1</code><br><code>Content-Type:text/html;charset=GB2312</code></p>
+<p><code>Content-Type</code><br>Content-Type实体报头域用语指明发送给接收者的实体正文的媒体类型。</p>
+<p><strong>eg：</strong><br><code>Content-Type:text/html;charset=ISO-8859-1</code><br><code>Content-Type:text/html;charset=GB2312</code></p>
 <p><code>Last-Modified</code><br><code>Last-Modified</code>实体报头域用于指示资源的最后修改日期和时间。</p>
-<p><code>Expires</code><br>Expires实体报头域给出响应过期的日期和时间。为了让代理服务器或浏览器在一段时间以后更新缓存中(再次访问曾访问过的页面时，直接从缓存中加载，缩短响应时间和降低服务器负载)的页面，我们可以使用Expires实体报头域指定页面过期的时间。<br><strong>eg：</strong><code>Expires：Thu，15 Sep 2006 16:23:12 GMT</code><br>HTTP1.1的客户端和缓存必须将其他非法的日期格式（包括0）看作已经过期。eg：为了让浏览器不要缓存页面，我们也可以利用Expires实体报头域，设置为0，jsp中程序如下：<code>response.setDateHeader(&quot;Expires&quot;,&quot;0&quot;);</code></p>
+<p><code>Expires</code><br>Expires实体报头域给出响应过期的日期和时间。为了让代理服务器或浏览器在一段时间以后更新缓存中(再次访问曾访问过的页面时，直接从缓存中加载，缩短响应时间和降低服务器负载)的页面，我们可以使用Expires实体报头域指定页面过期的时间。</p>
+<p><strong>eg：</strong><br><code>Expires：Thu，15 Sep 2006 16:23:12 GMT</code><br>HTTP1.1的客户端和缓存必须将其他非法的日期格式（包括0）看作已经过期。eg：为了让浏览器不要缓存页面，我们也可以利用Expires实体报头域，设置为0，jsp中程序如下：<code>response.setDateHeader(&quot;Expires&quot;,&quot;0&quot;);</code></p>
 
       
 
