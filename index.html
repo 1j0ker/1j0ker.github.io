@@ -152,6 +152,122 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-HTTP报头" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/08/16/HTTP报头/">CSRF</a>
+    </h1>
+  
+
+        
+        <a href="/2019/08/16/HTTP报头/" class="archive-article-date">
+  	<time datetime="2019-08-16T09:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-16</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4>HTTP报头 介绍</h4>
+
+<p>跟着前两天遇见的CSRF（Cross-site request forgery），去详细找了下HTTP报头的知识，学习下</p>
+<p>HTTP消息报头包括普通报头、请求报头、响应报头、实体报头。<br>每一个报头域都是由名字+“：”+空格+值 组成，消息报头域的名字是大小写无关的。</p>
+<h5>一、普通报头</h5>
+
+<p>在普通报头中，有少数报头域用于所有的请求和响应消息，但并不用于被传输的实体，只用于传输的消息。</p>
+<p><strong>eg：</strong><br><code>Cache-Control</code>   用于指定缓存指令，缓存指令是单向的（响应中出现的缓存指令在请求中未必会出现），且是独立的（一个消息的缓存指令不会影响另一个消息处理的缓存机制），HTTP1.0使用的类似的报头域为Pragma。<br>请求时的缓存指令包括：<code>no-cache</code>（用于指示请求或响应消息不能缓存）、<code>no-store、max-age</code>、<code>max-stale</code>、<code>min-fresh</code>、<code>only-if-cached</code>;</p>
+<p>响应时的缓存指令包括：<code>public</code>、<code>private</code>、<code>no-cache</code>、<code>no-store</code>、<code>no-transform</code>、<code>must-revalidate</code>、<code>proxy-revalidate</code>、<code>max-age</code>、<code>s-maxage</code>.</p>
+<p><strong>eg：</strong><br>为了指示IE浏览器（客户端）不要缓存页面，服务器端的JSP程序可以编写如下：<code>response.sehHeader</code>(“Cache-Control”,”no-cache”);<br>//response.setHeader(“Pragma”,”no-cache”);作用相当于上述代码，通常两者//合用<br>这句代码将在发送的响应消息中设置普通报头域：<code>Cache-Control:no-cache</code></p>
+<p><code>Date</code>普通报头域表示消息产生的日期和时间</p>
+<p><code>Connection</code>普通报头域允许发送指定连接的选项。例如指定连接是连续，或者指定“close”选项，通知服务器，在响应完成后，关闭连接。</p>
+<h5>二、请求报头</h5>
+
+<p>请求报头允许客户端向服务器端传递请求的附加信息以及客户端自身的信息。<br>常用的请求报头 <code>Accept</code><br>Accept请求报头域用于指定客户端接受哪些类型的信息。<strong>eg：</strong><code>Accept：image/gif</code>，表明客户端希望接受GIF图象格式的资源；Accept：text/html，表明客户端希望接受html文本。</p>
+<p><code>Accept-Charset</code><br>Accept-Charset请求报头域用于指定客户端接受的字符集。<strong>eg：</strong><code>Accept-Charset:iso-8859-1,gb2312</code>.如果在请求消息中没有设置这个域，缺省是任何字符集都可以接受。</p>
+<p><code>Accept-Encoding</code><br>Accept-Encoding请求报头域类似于Accept，但是它是用于指定可接受的内容编码。<strong>eg：</strong><code>Accept-Encoding:gzip.deflate</code>.如果请求消息中没有设置这个域服务器假定客户端对各种内容编码都可以接受。</p>
+<p><code>Accept-Language</code><br>Accept-Language请求报头域类似于Accept，但是它是用于指定一种自然语言。<strong>eg：</strong><code>Accept-Language:zh-cn</code>.如果请求消息中没有设置这个报头域，服务器假定客户端对各种语言都可以接受。</p>
+<p><code>Authorization</code><br>Authorization请求报头域主要用于证明客户端有权查看某个资源。当浏览器访问一个页面时，如果收到服务器的响应代码为401（未授权），可以发送一个包含Authorization请求报头域的请求，要求服务器对其进行验证。</p>
+<p><code>Host</code>（发送请求时，该报头域是必需的）<br>Host请求报头域主要用于指定被请求资源的Internet主机和端口号，它通常从HTTP URL中提取出来的，</p>
+<p><strong>eg:</strong><br>我们在浏览器中输入：<code>http://www.guet.edu.cn/index.html</code></p>
+<p>浏览器发送的请求消息中，就会包含Host请求报头域，如下：<br><code>Host：www.guet.edu.cn</code><br>此处使用缺省端口号80，若指定了端口号，则变成：<code>Host：www.guet.edu.cn:指定端口号</code></p>
+<p><code>User-Agent</code><br>我们上网登陆论坛的时候，往往会看到一些欢迎信息，其中列出了你的操作系统的名称和版本，你所使用的浏览器的名称和版本，这往往让很多人感到很神奇，实际上，服务器应用程序就是从<code>User-Agent</code>这个请求报头域中获取到这些信息。<code>User-Agent</code>请求报头域允许客户端将它的操作系统、浏览器和其它属性告诉服务器。不过，这个报头域不是必需的，如果我们自己编写一个浏览器，不使用<code>User-Agent</code>请求报头域，那么服务器端就无法得知我们的信息了。</p>
+<p>请求报头举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">GET /form.html HTTP/1.1 (CRLF)</span><br><span class="line">Accept:image/gif,image/x-xbitmap,image/jpeg,application/x-shockwave-flash,application/vnd.ms-excel,application/vnd.ms-powerpoint,application/msword,*/* (CRLF)</span><br><span class="line">Accept-Language:zh-cn (CRLF)</span><br><span class="line">Accept-Encoding:gzip,deflate (CRLF)</span><br><span class="line">If-Modified-Since:Wed,05 Jan 2007 11:21:25 GMT (CRLF)</span><br><span class="line">If-None-Match:W/&quot;80b1a4c018f3c41:8317&quot; (CRLF)</span><br><span class="line">User-Agent:Mozilla/4.0(compatible;MSIE6.0;Windows NT 5.0) (CRLF)</span><br><span class="line">Host:www.guet.edu.cn (CRLF)</span><br><span class="line">Connection:Keep-Alive (CRLF)</span><br><span class="line">(CRLF)</span><br></pre></td></tr></table></figure>
+
+<h5>三、响应报头</h5>
+响应报头允许服务器传递不能放在状态行中的附加响应信息，以及关于服务器的信息和对Request-URI所标识的资源进行下一步访问的信息。
+常用的响应报头
+
+<p><code>Location</code><br>Location响应报头域用于重定向接受者到一个新的位置。Location响应报头域常用在更换域名的时候。</p>
+<p><code>Server</code><br>Server响应报头域包含了服务器用来处理请求的软件信息。与<code>User-Agent</code>请求报头域是相对应的。下面是<br>Server响应报头域的一个例子：<br><code>Server：Apache-Coyote/1.1</code><br><code>WWW-Authenticate</code></p>
+<p><code>WWW-Authenticate</code>响应报头域必须被包含在401（未授权的）响应消息中，客户端收到401响应消息时候，并发送<code>Authorization</code>报头域请求服务器对其进行验证时，服务端响应报头就包含该报头域。<br><strong>eg：</strong><code>WWW-Authenticate:Basic realm=&quot;Basic Auth Test!&quot;</code>  //可以看出服务器对请求资源采用的是基本验证机制。</p>
+<h5>四、实体报头</h5>
+请求和响应消息都可以传送一个实体。一个实体由实体报头域和实体正文组成，但并不是说实体报头域和实体正文要在一起发送，可以只发送实体报头域。实体报头定义了关于实体正文（eg：有无实体正文）和请求所标识的资源的元信息。
+常用的实体报头
+
+<p><code>Content-Encoding</code><br>Content-Encoding实体报头域被用作媒体类型的修饰符，它的值指示了已经被应用到实体正文的附加内容的编码，因而要获得Content-Type报头域中所引用的媒体类型，必须采用相应的解码机制。<code>Content-Encoding</code>这样用于记录文档的压缩方法，<strong>eg：</strong><code>Content-Encoding：gzip</code></p>
+<p><code>Content-Language</code><br>Content-Language实体报头域描述了资源所用的自然语言。没有设置该域则认为实体内容将提供给所有的语言阅读者。<strong>eg：</strong><code>Content-Language:daContent-Length</code></p>
+<p><code>Content-Length</code>实体报头域用于指明实体正文的长度，以字节方式存储的十进制数字来表示。</p>
+<p><code>Content-Type</code><br>Content-Type实体报头域用语指明发送给接收者的实体正文的媒体类型。<br><strong>eg：</strong><br><code>Content-Type:text/html;charset=ISO-8859-1</code><br><code>Content-Type:text/html;charset=GB2312</code></p>
+<p><code>Last-Modified</code><br><code>Last-Modified</code>实体报头域用于指示资源的最后修改日期和时间。</p>
+<p><code>Expires</code><br>Expires实体报头域给出响应过期的日期和时间。为了让代理服务器或浏览器在一段时间以后更新缓存中(再次访问曾访问过的页面时，直接从缓存中加载，缩短响应时间和降低服务器负载)的页面，我们可以使用Expires实体报头域指定页面过期的时间。<br><strong>eg：</strong><code>Expires：Thu，15 Sep 2006 16:23:12 GMT</code><br>HTTP1.1的客户端和缓存必须将其他非法的日期格式（包括0）看作已经过期。eg：为了让浏览器不要缓存页面，我们也可以利用Expires实体报头域，设置为0，jsp中程序如下：<code>response.setDateHeader(&quot;Expires&quot;,&quot;0&quot;);</code></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/08/16/HTTP报头/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-CSRF" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -159,13 +275,13 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/08/12/CSRF/">CSRF</a>
+      <a class="article-title" href="/2019/08/14/CSRF/">CSRF</a>
     </h1>
   
 
         
-        <a href="/2019/08/12/CSRF/" class="archive-article-date">
-  	<time datetime="2019-08-12T09:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-12</time>
+        <a href="/2019/08/14/CSRF/" class="archive-article-date">
+  	<time datetime="2019-08-14T09:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-14</time>
 </a>
         
       </header>
@@ -254,7 +370,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2019/08/12/CSRF/">展开全文 >></a>
+          <a class="article-more-a" href="/2019/08/14/CSRF/">展开全文 >></a>
         </p>
       
 
@@ -1344,106 +1460,6 @@ To Be Continue... ...
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/07/30/openssh_updata_error/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-Crawl_spider" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/29/Crawl_spider/">Crawl_spider模块</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/29/Crawl_spider/" class="archive-article-date">
-  	<time datetime="2019-07-29T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-29</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2>Crawl_spider</h2>
-
-<p><code>CrawlSpider</code>也继承自<code>Spider</code>，所以具备它的所有特性，这些特性上章已经讲过了，就再在赘述了，这章就讲点它本身所独有的。<br>crawlspider比传统spider更加简便、智能；我们网站的url都是有一定规则的，像django，在<code>view</code>中定义的<code>urls</code>规则就是正则表示的。那么就可以根据这个特性来设计爬虫，而不是每次都要用spider分析页面格式，拆解源码，scrapy提供了CrawlSpider处理此需求。</p>
-<p>看看CrawlSpider类的代码：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CrawlSpider</span><span class="params">(Spider)</span>:</span></span><br><span class="line"></span><br><span class="line">    rules = ()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, *a, **kw)</span>:</span></span><br><span class="line">        super(CrawlSpider, self).__init__(*a, **kw)</span><br><span class="line">        self._compile_rules()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self._parse_response(response, self.parse_start_url, cb_kwargs=&#123;&#125;, follow=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse_start_url</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> []</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_results</span><span class="params">(self, response, results)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> results</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_build_request</span><span class="params">(self, rule, link)</span>:</span></span><br><span class="line">        r = Request(url=link.url, callback=self._response_downloaded)</span><br><span class="line">        r.meta.update(rule=rule, link_text=link.text)</span><br><span class="line">        <span class="keyword">return</span> r</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_requests_to_follow</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> isinstance(response, HtmlResponse):</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        seen = set()</span><br><span class="line">        <span class="keyword">for</span> n, rule <span class="keyword">in</span> enumerate(self._rules):</span><br><span class="line">            links = [lnk <span class="keyword">for</span> lnk <span class="keyword">in</span> rule.link_extractor.extract_links(response)</span><br><span class="line">                     <span class="keyword">if</span> lnk <span class="keyword">not</span> <span class="keyword">in</span> seen]</span><br><span class="line">            <span class="keyword">if</span> links <span class="keyword">and</span> rule.process_links:</span><br><span class="line">                links = rule.process_links(links)</span><br><span class="line">            <span class="keyword">for</span> link <span class="keyword">in</span> links:</span><br><span class="line">                seen.add(link)</span><br><span class="line">                r = self._build_request(n, link)</span><br><span class="line">                <span class="keyword">yield</span> rule.process_request(r)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_response_downloaded</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        rule = self._rules[response.meta[<span class="string">'rule'</span>]]</span><br><span class="line">        <span class="keyword">return</span> self._parse_response(response, rule.callback, rule.cb_kwargs, rule.follow)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_parse_response</span><span class="params">(self, response, callback, cb_kwargs, follow=True)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> callback:</span><br><span class="line">            cb_res = callback(response, **cb_kwargs) <span class="keyword">or</span> ()</span><br><span class="line">            cb_res = self.process_results(response, cb_res)</span><br><span class="line">            <span class="keyword">for</span> requests_or_item <span class="keyword">in</span> iterate_spider_output(cb_res):</span><br><span class="line">                <span class="keyword">yield</span> requests_or_item</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> follow <span class="keyword">and</span> self._follow_links:</span><br><span class="line">            <span class="keyword">for</span> request_or_item <span class="keyword">in</span> self._requests_to_follow(response):</span><br><span class="line">                <span class="keyword">yield</span> request_or_item</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_compile_rules</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">get_method</span><span class="params">(method)</span>:</span></span><br><span class="line">            <span class="keyword">if</span> callable(method):</span><br><span class="line">                <span class="keyword">return</span> method</span><br><span class="line">            <span class="keyword">elif</span> isinstance(method, six.string_types):</span><br><span class="line">                <span class="keyword">return</span> getattr(self, method, <span class="literal">None</span>)</span><br><span class="line"></span><br><span class="line">        self._rules = [copy.copy(r) <span class="keyword">for</span> r <span class="keyword">in</span> self.rules]</span><br><span class="line">        <span class="keyword">for</span> rule <span class="keyword">in</span> self._rules:</span><br><span class="line">            rule.callback = get_method(rule.callback)</span><br><span class="line">            rule.process_links = get_method(rule.process_links)</span><br><span class="line">            rule.process_request = get_method(rule.process_request)</span><br><span class="line"></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">from_crawler</span><span class="params">(cls, crawler, *args, **kwargs)</span>:</span></span><br><span class="line">        spider = super(CrawlSpider, cls).from_crawler(crawler, *args, **kwargs)</span><br><span class="line">        spider._follow_links = crawler.settings.getbool(</span><br><span class="line">            <span class="string">'CRAWLSPIDER_FOLLOW_LINKS'</span>, <span class="literal">True</span>)</span><br><span class="line">        <span class="keyword">return</span> spider</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">set_crawler</span><span class="params">(self, crawler)</span>:</span></span><br><span class="line">        super(CrawlSpider, self).set_crawler(crawler)</span><br><span class="line">        self._follow_links = crawler.settings.getbool(<span class="string">'CRAWLSPIDER_FOLLOW_LINKS'</span>, <span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
-
-<p><strong>其中的方法很多而且很详细，这里先介绍三种主要常用的方法：</strong></p>
-<p><strong>rules：</strong><br>它是一个列表，存储的元素时<code>Rule</code>类的实例，其中每一个实例都定义了一种采集站点的行为。如果有多个<code>rule</code>都匹配同一个链接，那么位置下标最小的一个<code>rule</code>将会被使用。 CrawlSpider本身有去重的行为。</p>
-<p><strong>callback：</strong><br>该值可以是一个方法，也可以是一个字符串（spider实例中一个方法的名称）。它就是一个回调方法，它的作用是在此处调用一个指定的方法。<br>但要注意的是：要慎用<code>parse</code>做为回调方法，因为这边的<code>parse</code>已经不像传统spider类中的那样没有具体操作，调用同名的<code>parse</code>可能会造成冲突。</p>
-<p><strong>follow：</strong><br>是一个布尔对象，表示是当前<code>response</code>否继续采集。如果<code>callback</code>是None，那么它就默认为True，否则为False。</p>
-<hr>
-<h4>整个数据的流向如下图所示：</h4>
-
-<p><img src="https://1j0ker.github.io/md_img/CrwalSpider.jpg" alt="exmple1.md"></p>
-<hr>
-<h4>CrawlSpider爬取微信小程序文章</h4>
-
-<p><strong>spider.py:</strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="keyword">from</span> scrapy.linkextractors <span class="keyword">import</span> LinkExtractor</span><br><span class="line"><span class="keyword">from</span> scrapy.spiders <span class="keyword">import</span> CrawlSpider, Rule</span><br><span class="line"><span class="keyword">from</span> WXapp.items <span class="keyword">import</span> WxappItem</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WxappSpiderSpider</span><span class="params">(CrawlSpider)</span>:</span></span><br><span class="line">    name = <span class="string">'wxapp_spider'</span></span><br><span class="line">    allowed_domains = [<span class="string">'wxapp-union.com'</span>]</span><br><span class="line">    start_urls = [<span class="string">'http://www.wxapp-union.com/portal.php?mod=list&amp;catid=2&amp;page=1'</span>]</span><br><span class="line"></span><br><span class="line">    rules = (</span><br><span class="line">        Rule(LinkExtractor(allow=<span class="string">r".+mod=list&amp;catid=2&amp;page=\d"</span>), follow=<span class="literal">True</span>),</span><br><span class="line">        Rule(LinkExtractor(allow=<span class="string">r".+article.+\.html"</span>), callback=<span class="string">"parse_item"</span>, follow=<span class="literal">False</span>)</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse_item</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        title = response.xpath(<span class="string">"//h1[@class='ph']/text()"</span>).get()</span><br><span class="line">        author = response.xpath(<span class="string">"//p[@class='authors']//a/text()"</span>).get()</span><br><span class="line">        content_json = response.xpath(<span class="string">"//td[@id='article_content']//text()"</span>).getall()<span class="comment">#很多标签有内容，使用getall()全部获得，list型数据</span></span><br><span class="line">        content = <span class="string">""</span>.join(content_json).strip()<span class="comment">#转成字符串形式</span></span><br><span class="line">        item = WxappItem(title=title, author=author, content=content)</span><br><span class="line">        <span class="keyword">yield</span> item</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><code>CrawlSpider</code>使用的重点就是<code>rules</code>规则的构造，确保构造出所允许的采集站点；</li>
-<li>item.py中更改相应的<code>WxappItem</code>方法；</li>
-</ul>
-<br>
-
-<br>
-(PS:T-ara十周年快乐啊!)
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/29/Crawl_spider/">展开全文 >></a>
         </p>
       
 

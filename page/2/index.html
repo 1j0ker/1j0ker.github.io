@@ -152,6 +152,106 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-Crawl_spider" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/29/Crawl_spider/">Crawl_spider模块</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/29/Crawl_spider/" class="archive-article-date">
+  	<time datetime="2019-07-29T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-29</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2>Crawl_spider</h2>
+
+<p><code>CrawlSpider</code>也继承自<code>Spider</code>，所以具备它的所有特性，这些特性上章已经讲过了，就再在赘述了，这章就讲点它本身所独有的。<br>crawlspider比传统spider更加简便、智能；我们网站的url都是有一定规则的，像django，在<code>view</code>中定义的<code>urls</code>规则就是正则表示的。那么就可以根据这个特性来设计爬虫，而不是每次都要用spider分析页面格式，拆解源码，scrapy提供了CrawlSpider处理此需求。</p>
+<p>看看CrawlSpider类的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CrawlSpider</span><span class="params">(Spider)</span>:</span></span><br><span class="line"></span><br><span class="line">    rules = ()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, *a, **kw)</span>:</span></span><br><span class="line">        super(CrawlSpider, self).__init__(*a, **kw)</span><br><span class="line">        self._compile_rules()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self._parse_response(response, self.parse_start_url, cb_kwargs=&#123;&#125;, follow=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse_start_url</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> []</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_results</span><span class="params">(self, response, results)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> results</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_build_request</span><span class="params">(self, rule, link)</span>:</span></span><br><span class="line">        r = Request(url=link.url, callback=self._response_downloaded)</span><br><span class="line">        r.meta.update(rule=rule, link_text=link.text)</span><br><span class="line">        <span class="keyword">return</span> r</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_requests_to_follow</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> isinstance(response, HtmlResponse):</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        seen = set()</span><br><span class="line">        <span class="keyword">for</span> n, rule <span class="keyword">in</span> enumerate(self._rules):</span><br><span class="line">            links = [lnk <span class="keyword">for</span> lnk <span class="keyword">in</span> rule.link_extractor.extract_links(response)</span><br><span class="line">                     <span class="keyword">if</span> lnk <span class="keyword">not</span> <span class="keyword">in</span> seen]</span><br><span class="line">            <span class="keyword">if</span> links <span class="keyword">and</span> rule.process_links:</span><br><span class="line">                links = rule.process_links(links)</span><br><span class="line">            <span class="keyword">for</span> link <span class="keyword">in</span> links:</span><br><span class="line">                seen.add(link)</span><br><span class="line">                r = self._build_request(n, link)</span><br><span class="line">                <span class="keyword">yield</span> rule.process_request(r)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_response_downloaded</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        rule = self._rules[response.meta[<span class="string">'rule'</span>]]</span><br><span class="line">        <span class="keyword">return</span> self._parse_response(response, rule.callback, rule.cb_kwargs, rule.follow)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_parse_response</span><span class="params">(self, response, callback, cb_kwargs, follow=True)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> callback:</span><br><span class="line">            cb_res = callback(response, **cb_kwargs) <span class="keyword">or</span> ()</span><br><span class="line">            cb_res = self.process_results(response, cb_res)</span><br><span class="line">            <span class="keyword">for</span> requests_or_item <span class="keyword">in</span> iterate_spider_output(cb_res):</span><br><span class="line">                <span class="keyword">yield</span> requests_or_item</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> follow <span class="keyword">and</span> self._follow_links:</span><br><span class="line">            <span class="keyword">for</span> request_or_item <span class="keyword">in</span> self._requests_to_follow(response):</span><br><span class="line">                <span class="keyword">yield</span> request_or_item</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_compile_rules</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">get_method</span><span class="params">(method)</span>:</span></span><br><span class="line">            <span class="keyword">if</span> callable(method):</span><br><span class="line">                <span class="keyword">return</span> method</span><br><span class="line">            <span class="keyword">elif</span> isinstance(method, six.string_types):</span><br><span class="line">                <span class="keyword">return</span> getattr(self, method, <span class="literal">None</span>)</span><br><span class="line"></span><br><span class="line">        self._rules = [copy.copy(r) <span class="keyword">for</span> r <span class="keyword">in</span> self.rules]</span><br><span class="line">        <span class="keyword">for</span> rule <span class="keyword">in</span> self._rules:</span><br><span class="line">            rule.callback = get_method(rule.callback)</span><br><span class="line">            rule.process_links = get_method(rule.process_links)</span><br><span class="line">            rule.process_request = get_method(rule.process_request)</span><br><span class="line"></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">from_crawler</span><span class="params">(cls, crawler, *args, **kwargs)</span>:</span></span><br><span class="line">        spider = super(CrawlSpider, cls).from_crawler(crawler, *args, **kwargs)</span><br><span class="line">        spider._follow_links = crawler.settings.getbool(</span><br><span class="line">            <span class="string">'CRAWLSPIDER_FOLLOW_LINKS'</span>, <span class="literal">True</span>)</span><br><span class="line">        <span class="keyword">return</span> spider</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">set_crawler</span><span class="params">(self, crawler)</span>:</span></span><br><span class="line">        super(CrawlSpider, self).set_crawler(crawler)</span><br><span class="line">        self._follow_links = crawler.settings.getbool(<span class="string">'CRAWLSPIDER_FOLLOW_LINKS'</span>, <span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+
+<p><strong>其中的方法很多而且很详细，这里先介绍三种主要常用的方法：</strong></p>
+<p><strong>rules：</strong><br>它是一个列表，存储的元素时<code>Rule</code>类的实例，其中每一个实例都定义了一种采集站点的行为。如果有多个<code>rule</code>都匹配同一个链接，那么位置下标最小的一个<code>rule</code>将会被使用。 CrawlSpider本身有去重的行为。</p>
+<p><strong>callback：</strong><br>该值可以是一个方法，也可以是一个字符串（spider实例中一个方法的名称）。它就是一个回调方法，它的作用是在此处调用一个指定的方法。<br>但要注意的是：要慎用<code>parse</code>做为回调方法，因为这边的<code>parse</code>已经不像传统spider类中的那样没有具体操作，调用同名的<code>parse</code>可能会造成冲突。</p>
+<p><strong>follow：</strong><br>是一个布尔对象，表示是当前<code>response</code>否继续采集。如果<code>callback</code>是None，那么它就默认为True，否则为False。</p>
+<hr>
+<h4>整个数据的流向如下图所示：</h4>
+
+<p><img src="https://1j0ker.github.io/md_img/CrwalSpider.jpg" alt="exmple1.md"></p>
+<hr>
+<h4>CrawlSpider爬取微信小程序文章</h4>
+
+<p><strong>spider.py:</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="keyword">from</span> scrapy.linkextractors <span class="keyword">import</span> LinkExtractor</span><br><span class="line"><span class="keyword">from</span> scrapy.spiders <span class="keyword">import</span> CrawlSpider, Rule</span><br><span class="line"><span class="keyword">from</span> WXapp.items <span class="keyword">import</span> WxappItem</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WxappSpiderSpider</span><span class="params">(CrawlSpider)</span>:</span></span><br><span class="line">    name = <span class="string">'wxapp_spider'</span></span><br><span class="line">    allowed_domains = [<span class="string">'wxapp-union.com'</span>]</span><br><span class="line">    start_urls = [<span class="string">'http://www.wxapp-union.com/portal.php?mod=list&amp;catid=2&amp;page=1'</span>]</span><br><span class="line"></span><br><span class="line">    rules = (</span><br><span class="line">        Rule(LinkExtractor(allow=<span class="string">r".+mod=list&amp;catid=2&amp;page=\d"</span>), follow=<span class="literal">True</span>),</span><br><span class="line">        Rule(LinkExtractor(allow=<span class="string">r".+article.+\.html"</span>), callback=<span class="string">"parse_item"</span>, follow=<span class="literal">False</span>)</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse_item</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        title = response.xpath(<span class="string">"//h1[@class='ph']/text()"</span>).get()</span><br><span class="line">        author = response.xpath(<span class="string">"//p[@class='authors']//a/text()"</span>).get()</span><br><span class="line">        content_json = response.xpath(<span class="string">"//td[@id='article_content']//text()"</span>).getall()<span class="comment">#很多标签有内容，使用getall()全部获得，list型数据</span></span><br><span class="line">        content = <span class="string">""</span>.join(content_json).strip()<span class="comment">#转成字符串形式</span></span><br><span class="line">        item = WxappItem(title=title, author=author, content=content)</span><br><span class="line">        <span class="keyword">yield</span> item</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>CrawlSpider</code>使用的重点就是<code>rules</code>规则的构造，确保构造出所允许的采集站点；</li>
+<li>item.py中更改相应的<code>WxappItem</code>方法；</li>
+</ul>
+<br>
+
+<br>
+(PS:T-ara十周年快乐啊!)
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/29/Crawl_spider/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-scrapy初学习" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -597,6 +697,99 @@ CSP虽然有着严格的白名单控制，但仍然只能减轻以偷取信息�
 
 
   
+    <article id="post-py_threading" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/15/py_threading/">Python多线程的变量影响</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/15/py_threading/" class="archive-article-date">
+  	<time datetime="2019-07-15T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Python多线程的变量影响"><a href="#Python多线程的变量影响" class="headerlink" title="Python多线程的变量影响"></a>Python多线程的变量影响</h1><h3 id="example1：sleep-控制多线程的变量"><a href="#example1：sleep-控制多线程的变量" class="headerlink" title="example1：sleep()控制多线程的变量"></a>example1：sleep()控制多线程的变量</h3><hr>
+<p><strong>py代码：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">num = <span class="number">100</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_1</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> num</span><br><span class="line">    print(<span class="string">"work_1 ---- %d\n"</span> % num)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_2</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        num += <span class="number">1</span></span><br><span class="line">        print(<span class="string">"work_2 ---- %d\n"</span> % num)</span><br><span class="line">        time.sleep(<span class="number">1</span>)<span class="comment">#sleep()控制了work_2线程顺序</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    print(<span class="string">"num最初：%d\n"</span> %num)</span><br><span class="line">    t_1 = threading.Thread(target=work_1)</span><br><span class="line">    t_2 = threading.Thread(target=work_2)</span><br><span class="line">    t_2.start()</span><br><span class="line">    time.sleep(<span class="number">0.5</span>)<span class="comment">#sleep()控制了线程顺序</span></span><br><span class="line">    t_1.start()<span class="comment">#线程只能start一次</span></span><br><span class="line">    time.sleep(<span class="number">3</span>)</span><br><span class="line">    print(<span class="string">"num最后：%d\n"</span> %num)</span><br></pre></td></tr></table></figure>
+
+<p>通过运行结果，发现<code>work_2()</code>中的sleep(1)使得work_2的线程未执行完函数，num便被<code>work_1()</code>调用，所以work_1的num不是103；<br><br><br><img src="https://1j0ker.github.io/md_img/threading_1.jpg" alt="exmple1.md"><br><br></p>
+<h3 id="example2：多线程各自非顺序计算对全局变量的影响"><a href="#example2：多线程各自非顺序计算对全局变量的影响" class="headerlink" title="example2：多线程各自非顺序计算对全局变量的影响"></a>example2：多线程各自非顺序计算对全局变量的影响</h3><p><br>—————————————————————————-<br><strong>py代码：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">g_num = <span class="number">0</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_threading</span><span class="params">(num)</span>:</span></span><br><span class="line">    <span class="keyword">global</span> g_num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num):</span><br><span class="line">        g_num += <span class="number">1</span></span><br><span class="line">     </span><br><span class="line">    print(<span class="string">"work_threading ---- %d\n"</span> % g_num)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work</span><span class="params">(num)</span>:</span></span><br><span class="line">    <span class="keyword">global</span> g_num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num):</span><br><span class="line">        g_num += <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">    print(<span class="string">"work ---- %d\n"</span> % g_num)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">	print(<span class="string">"创建多线程之前g_num: %d"</span>%g_num)</span><br><span class="line"></span><br><span class="line">	t = threading.Thread(target=work_threading, args=(<span class="number">100000</span>,))</span><br><span class="line">	t.start()</span><br><span class="line">	<span class="comment">#time.sleep(1)</span></span><br><span class="line">	work(<span class="number">100000</span>)</span><br></pre></td></tr></table></figure>
+
+<p><em>看一下执行结果：</em></p>
+<p><img src="https://1j0ker.github.io/md_img/threading_val2.jpg" alt="exmple2.md"><br><br><br>&#8195;&#8195;能看到，每次执行结果都可能都不相同，原因就是，<code>work_threading()</code>线程调用时使其独自计算，代码继续下读，到<code>work()</code>导致在未完成完整的函数计算时，被双方调用的g_num可能是非最终结果（正常计算应该是100000），造成了最后参数的混乱不一；<br><em>（<code>work()</code>也可以是多线程函数，这里用普通循环函数，便于对比和理解）</em><br><br><br>可以在<code>work_threading()</code>和<code>work()</code>中添加<code>sleep()</code>,确保函数调用的按序进行，也就是example1中的<code>sleep()</code>影响全局变量原因；<br><br><br><img src="https://1j0ker.github.io/md_img/threading_val3.jpg" alt="exmple3.md"></p>
+<br>
+--------------
+
+<h3 id="test-1-多线程探测主机"><a href="#test-1-多线程探测主机" class="headerlink" title="test_1:多线程探测主机"></a>test_1:多线程探测主机</h3><p><em>测试一下我所在的ip段</em></p>
+<p><strong>py代码：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">#-*- coding:utf-8 -*-</span><br><span class="line"></span><br><span class="line">import threading</span><br><span class="line">import time</span><br><span class="line">import os		#调用os模块，启动cmd</span><br><span class="line"></span><br><span class="line">code = os.popen(&apos;chcp 65001&apos;)#cmd的GBK编码问题，转成utf-8</span><br><span class="line"></span><br><span class="line">def Check_ip(ip):</span><br><span class="line">    cmd_ip = &apos;ping -n 1 xxx.xxx.xxx.&apos; + str(ip)	# -n 1仅仅探测一个回包，速度更快</span><br><span class="line">    #print(cmd_ip)</span><br><span class="line">    check = os.popen(cmd_ip)</span><br><span class="line">    data = check.read()</span><br><span class="line">    #print(data)</span><br><span class="line">    if &apos;TTL&apos; in data:</span><br><span class="line">        print(&apos;%s is UP\n&apos; % cmd_ip)</span><br><span class="line">    time.sleep(0.5)</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    for i in range(1,255):</span><br><span class="line">        t = threading.Thread(target=Check_ip, args=(i, ))</span><br><span class="line">        t.start()</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<p>&#8195;&#8195;结果能感觉到，速度明显的加快，打印下进程：</p>
+<p><img src="https://1j0ker.github.io/md_img/threading_checkip1.jpg" alt="exmple4.md"></p>
+<p>###To be continued…</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/15/py_threading/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-X-Forward-f" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -710,99 +903,6 @@ CSP虽然有着严格的白名单控制，但仍然只能减轻以偷取信息�
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/07/15/X-Forward-f/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-py_threading" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/15/py_threading/">Python多线程的变量影响</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/15/py_threading/" class="archive-article-date">
-  	<time datetime="2019-07-15T14:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-15</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="Python多线程的变量影响"><a href="#Python多线程的变量影响" class="headerlink" title="Python多线程的变量影响"></a>Python多线程的变量影响</h1><h3 id="example1：sleep-控制多线程的变量"><a href="#example1：sleep-控制多线程的变量" class="headerlink" title="example1：sleep()控制多线程的变量"></a>example1：sleep()控制多线程的变量</h3><hr>
-<p><strong>py代码：</strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">num = <span class="number">100</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_1</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> num</span><br><span class="line">    print(<span class="string">"work_1 ---- %d\n"</span> % num)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_2</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        num += <span class="number">1</span></span><br><span class="line">        print(<span class="string">"work_2 ---- %d\n"</span> % num)</span><br><span class="line">        time.sleep(<span class="number">1</span>)<span class="comment">#sleep()控制了work_2线程顺序</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    print(<span class="string">"num最初：%d\n"</span> %num)</span><br><span class="line">    t_1 = threading.Thread(target=work_1)</span><br><span class="line">    t_2 = threading.Thread(target=work_2)</span><br><span class="line">    t_2.start()</span><br><span class="line">    time.sleep(<span class="number">0.5</span>)<span class="comment">#sleep()控制了线程顺序</span></span><br><span class="line">    t_1.start()<span class="comment">#线程只能start一次</span></span><br><span class="line">    time.sleep(<span class="number">3</span>)</span><br><span class="line">    print(<span class="string">"num最后：%d\n"</span> %num)</span><br></pre></td></tr></table></figure>
-
-<p>通过运行结果，发现<code>work_2()</code>中的sleep(1)使得work_2的线程未执行完函数，num便被<code>work_1()</code>调用，所以work_1的num不是103；<br><br><br><img src="https://1j0ker.github.io/md_img/threading_1.jpg" alt="exmple1.md"><br><br></p>
-<h3 id="example2：多线程各自非顺序计算对全局变量的影响"><a href="#example2：多线程各自非顺序计算对全局变量的影响" class="headerlink" title="example2：多线程各自非顺序计算对全局变量的影响"></a>example2：多线程各自非顺序计算对全局变量的影响</h3><p><br>—————————————————————————-<br><strong>py代码：</strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">g_num = <span class="number">0</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_threading</span><span class="params">(num)</span>:</span></span><br><span class="line">    <span class="keyword">global</span> g_num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num):</span><br><span class="line">        g_num += <span class="number">1</span></span><br><span class="line">     </span><br><span class="line">    print(<span class="string">"work_threading ---- %d\n"</span> % g_num)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work</span><span class="params">(num)</span>:</span></span><br><span class="line">    <span class="keyword">global</span> g_num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num):</span><br><span class="line">        g_num += <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">    print(<span class="string">"work ---- %d\n"</span> % g_num)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">	print(<span class="string">"创建多线程之前g_num: %d"</span>%g_num)</span><br><span class="line"></span><br><span class="line">	t = threading.Thread(target=work_threading, args=(<span class="number">100000</span>,))</span><br><span class="line">	t.start()</span><br><span class="line">	<span class="comment">#time.sleep(1)</span></span><br><span class="line">	work(<span class="number">100000</span>)</span><br></pre></td></tr></table></figure>
-
-<p><em>看一下执行结果：</em></p>
-<p><img src="https://1j0ker.github.io/md_img/threading_val2.jpg" alt="exmple2.md"><br><br><br>&#8195;&#8195;能看到，每次执行结果都可能都不相同，原因就是，<code>work_threading()</code>线程调用时使其独自计算，代码继续下读，到<code>work()</code>导致在未完成完整的函数计算时，被双方调用的g_num可能是非最终结果（正常计算应该是100000），造成了最后参数的混乱不一；<br><em>（<code>work()</code>也可以是多线程函数，这里用普通循环函数，便于对比和理解）</em><br><br><br>可以在<code>work_threading()</code>和<code>work()</code>中添加<code>sleep()</code>,确保函数调用的按序进行，也就是example1中的<code>sleep()</code>影响全局变量原因；<br><br><br><img src="https://1j0ker.github.io/md_img/threading_val3.jpg" alt="exmple3.md"></p>
-<br>
---------------
-
-<h3 id="test-1-多线程探测主机"><a href="#test-1-多线程探测主机" class="headerlink" title="test_1:多线程探测主机"></a>test_1:多线程探测主机</h3><p><em>测试一下我所在的ip段</em></p>
-<p><strong>py代码：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">#-*- coding:utf-8 -*-</span><br><span class="line"></span><br><span class="line">import threading</span><br><span class="line">import time</span><br><span class="line">import os		#调用os模块，启动cmd</span><br><span class="line"></span><br><span class="line">code = os.popen(&apos;chcp 65001&apos;)#cmd的GBK编码问题，转成utf-8</span><br><span class="line"></span><br><span class="line">def Check_ip(ip):</span><br><span class="line">    cmd_ip = &apos;ping -n 1 xxx.xxx.xxx.&apos; + str(ip)	# -n 1仅仅探测一个回包，速度更快</span><br><span class="line">    #print(cmd_ip)</span><br><span class="line">    check = os.popen(cmd_ip)</span><br><span class="line">    data = check.read()</span><br><span class="line">    #print(data)</span><br><span class="line">    if &apos;TTL&apos; in data:</span><br><span class="line">        print(&apos;%s is UP\n&apos; % cmd_ip)</span><br><span class="line">    time.sleep(0.5)</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    for i in range(1,255):</span><br><span class="line">        t = threading.Thread(target=Check_ip, args=(i, ))</span><br><span class="line">        t.start()</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
-
-<p>&#8195;&#8195;结果能感觉到，速度明显的加快，打印下进程：</p>
-<p><img src="https://1j0ker.github.io/md_img/threading_checkip1.jpg" alt="exmple4.md"></p>
-<p>###To be continued…</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">To be continued...</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/15/py_threading/">展开全文 >></a>
         </p>
       
 
